@@ -1,5 +1,7 @@
 package models
 
-class Player {
+import java.util.UUID.randomUUID
 
+class Player(name: String) {
+  val id = randomUUID().toString
 }

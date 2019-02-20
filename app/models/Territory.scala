@@ -1,5 +1,4 @@
 package models
 
-class Territory {
-
+class Territory(number: Int) {
 }
