@@ -1,15 +1,29 @@
 package models
 
+import common.Utils._
+import models.interface.{Formattable, Identifiable}
+import play.api.libs.json._
+
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-class Game(val name: String, var owner: Player) extends Identifiable {
+class Game(val name: String, var owner: Player) extends Identifiable with Formattable {
   var playing = false
   val players = ListBuffer(owner)
   var turns: List[Player] = _
   var turnIndex: Int = _
   var continents: List[Continent] = _
   var territories: List[Territory] = _
+
+  override def format: JsValue = Json.obj(
+    "id" -> JsString(id),
+    "playing" -> JsBoolean(playing),
+    "players" -> toJson(players),
+    "turns" -> toJson(turns),
+    "turnIndex" -> JsNumber(turnIndex),
+    "continents" -> toJson(continents),
+    "territories" -> toJson(territories),
+  )
 
   def addPlayer(player: Player): Unit = {
     if (playing) throw new Error("Unable to add a player during the game.")
@@ -36,6 +50,7 @@ class Game(val name: String, var owner: Player) extends Identifiable {
   }
 
   def start() = {
+    // TODO: only owner can start
     if (players.length < 3) throw new Error("Not enough players.")
     if (players.length > 6) throw new Error("Too many players.")
 

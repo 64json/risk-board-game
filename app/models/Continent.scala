@@ -1,7 +1,17 @@
 package models
 
-class Continent(val name: String, val territories: List[Territory]) extends Identifiable {
+import common.Utils._
+import models.interface.{Formattable, Identifiable}
+import play.api.libs.json._
+
+class Continent(val name: String, val territories: List[Territory]) extends Identifiable with Formattable {
   def apply(number: Int): Territory = territories(number - 1)
+
+  override def format: JsValue = Json.obj(
+    "id" -> JsString(id),
+    "name" -> JsString(name),
+    "territories" -> toJson(territories),
+  )
 }
 
 object Continent {
