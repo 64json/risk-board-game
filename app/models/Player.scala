@@ -1,7 +1,5 @@
 package models
 
-import java.util.UUID.randomUUID
-
-class Player(name: String) {
-  val id = randomUUID().toString
+class Player(val name: String) extends Identifiable {
+  var assignedArmies: Integer = 0
 }
