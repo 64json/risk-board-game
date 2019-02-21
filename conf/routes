@@ -3,13 +3,15 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET         /*path/                    controllers.HomeController.untrail(path)
-GET         /                          controllers.HomeController.index
-GET         /game                      controllers.GameController.list
-POST        /game                      controllers.GameController.create
-GET         /game/:gameId              controllers.GameController.get(gameId)
-POST        /game/:gameId/join         controllers.GameController.join(gameId)
-POST        /game/:gameId/start        controllers.GameController.start(gameId)
+GET     /*path/                    controllers.Application.untrail(path)
+GET     /                          controllers.Application.index
+GET     /connect                   controllers.Application.connect
+
+GET     /game                      controllers.GameController.list
+POST    /game                      controllers.GameController.create
+GET     /game/:gameId              controllers.GameController.get(gameId)
+POST    /game/:gameId/join         controllers.GameController.join(gameId)
+POST    /game/:gameId/start        controllers.GameController.start(gameId)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
