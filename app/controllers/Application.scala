@@ -14,10 +14,6 @@ class Application @Inject()(cc: ControllerComponents)(implicit system: ActorSyst
     MovedPermanently("/" + path)
   }
 
-  def index = Action {
-    Ok(views.html.index("Your new application is ready."))
-  }
-
   implicit val transformer = MessageFlowTransformer.jsonMessageFlowTransformer
 
   def connect = WebSocket.accept[JsValue, JsValue] { request =>
