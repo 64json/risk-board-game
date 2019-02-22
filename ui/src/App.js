@@ -112,9 +112,19 @@ class App extends Component {
                           <div>
                             Game: {game.name}
                           </div>
-                          <div>
-                            Players: {game.players.map(player => player.name).join(', ')}
-                          </div>
+                          {
+                            game.playing ?
+                              <div>
+                                Players: {
+                                game.players
+                                  .sort((p1, p2) => game.turns.indexOf(p1.id) - game.turns.indexOf(p2.id))
+                                  .map(player => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${game.turns.indexOf(player.id)})`).join(', ')
+                              }
+                              </div> :
+                              <div>
+                                Players: {game.players.map(player => `${player.name}`).join(', ')}
+                              </div>
+                          }
                           <div>
                             <div>
                               {
@@ -131,6 +141,23 @@ class App extends Component {
                               Leave
                             </button>
                           </div>
+                          <hr/>
+                          {
+                            game.playing &&
+                            game.continents.map(continent => (
+                              <div key={continent.id}>
+                                {continent.name}
+                                {
+                                  continent.territories.map(territory => (
+                                    <div key={territory.id}>
+                                      -- {territory.name}
+                                    </div>
+                                  ))
+                                }
+                                <br/>
+                              </div>
+                            ))
+                          }
                         </div> :
                         <div>
                           <div>
