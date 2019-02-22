@@ -18,9 +18,13 @@ object Utils {
   def typedTuple[T0, T1](a: List[JsValue])(implicit t0: Reads[T0], t1: Reads[T1]) =
     (a(0).as[T0], a(1).as[T1])
 
-  def onlyId[T <: Identifiable](list: Seq[T]): Seq[String] = {
+  def onlyId[T <: Identifiable](obj: T): String = {
+    if (obj == null) return null
+    obj.id
+  }
+
+  def onlyIds[T <: Identifiable](list: Seq[T]): Seq[String] = {
     if (list == null) return null
-    System.out.print(list)
-    list.map(_.id)
+    list.map(onlyId)
   }
 }

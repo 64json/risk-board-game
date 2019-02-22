@@ -10,23 +10,22 @@ import scala.util.Random
 
 class Game(val name: String, var owner: Player) extends Identifiable with Formattable with Receivable {
   var playing = false
-  val players = ArrayBuffer(owner)
+  val players: ArrayBuffer[Player] = ArrayBuffer()
   var turns: List[Player] = _
   var turnIndex: Int = _
   var continents: List[Continent] = _
-  var territories: List[Territory] = _
+  join(owner)
 
   override def format: JsValue = Json.obj(
     "id" -> JsString(id),
     "playing" -> JsBoolean(playing),
-    "players" -> toJson(onlyId(players)),
-    "turns" -> toJson(onlyId(turns)),
+    "players" -> toJson(players),
+    "turns" -> toJson(onlyIds(turns)),
     "turnIndex" -> JsNumber(turnIndex),
-    "continents" -> toJson(onlyId(continents)),
-    "territories" -> toJson(onlyId(territories)),
+    "continents" -> toJson(continents),
   )
 
-  override def receivers = players
+  override def receivers: ArrayBuffer[Player] = players
 
   def join(player: Player): Unit = {
     if (player.game != null) throw new Error("The player is already in a game.")
@@ -67,7 +66,6 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
     turns = Random.shuffle(players.toList)
     turnIndex = 0
     continents = Continent.createContinents
-    territories = continents.flatMap(_.territories)
   }
 
   def destroy(): Unit = {

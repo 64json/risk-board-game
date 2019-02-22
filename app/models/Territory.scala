@@ -18,8 +18,8 @@ class Territory(val name: String) extends Identifiable with Formattable {
   override def format: JsValue = Json.obj(
     "id" -> JsString(id),
     "name" -> JsString(name),
-    "adjacencyTerritories" -> toJson(onlyId(adjacencyTerritories)),
-    "owner" -> JsString(owner.id),
+    "adjacencyTerritories" -> toJson(onlyIds(adjacencyTerritories)),
+    "owner" -> JsString(onlyId(owner)),
     "armies" -> JsNumber(armies),
   )
 }

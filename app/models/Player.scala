@@ -1,6 +1,7 @@
 package models
 
 import akka.actor.ActorRef
+import common.Utils._
 import models.interface.{Formattable, Identifiable, Receivable}
 import play.api.libs.json._
 
@@ -13,7 +14,7 @@ class Player(val name: String, val receiver: ActorRef) extends Identifiable with
   override def format: JsValue = Json.obj(
     "id" -> JsString(id),
     "name" -> JsString(name),
-    "game" -> JsString(game.id),
+    "game" -> JsString(onlyId(game)),
     "assignedArmies" -> JsNumber(assignedArmies),
   )
 

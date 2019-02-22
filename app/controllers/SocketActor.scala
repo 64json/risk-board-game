@@ -29,9 +29,9 @@ object SocketActor extends Receivable {
     option.get
   }
 
-  override def receivers = players
+  override def receivers: ArrayBuffer[Player] = players
 
-  // TODO: periodically send out list of games/players
+  // TODO: periodically send out list of games{id, name, owner, playing, players} and players{id, name, game}
 }
 
 class SocketActor(receiver: ActorRef) extends Actor {
@@ -67,19 +67,30 @@ class SocketActor(receiver: ActorRef) extends Actor {
     }
   }
 
-  def register(args: List[JsValue]) = {
+  def register(args: List[JsValue]): Unit = {
     val playerName = typed[String](args)
 
+    if (player != null) throw new Error("Already registered.")
     player = new Player(playerName, receiver)
     SocketActor.players += player
+
+    player.send(Json.obj(
+      "player" -> player
+    ))
   }
 
-  def unregister(args: List[JsValue]) = {
-    if (player.game != null) player.game.leave(player)
+  def unregister(args: List[JsValue]): Unit = {
+    if (player == null) throw new Error("Already unregistered.")
     SocketActor.players -= player
+    if (player.game != null) player.game.leave(player)
+    player = null
+
+    receiver ! Json.obj(
+      "player" -> player
+    )
   }
 
-  def createGame(args: List[JsValue]) = {
+  def createGame(args: List[JsValue]): Unit = {
     val gameName = typed[String](args)
 
     val game = new Game(gameName, player)
