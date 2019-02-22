@@ -1,6 +1,7 @@
 package common
 
 import models.interface.Identifiable
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.api.mvc.Results.Ok
 
@@ -26,5 +27,14 @@ object Utils {
   def onlyIds[T <: Identifiable](list: Seq[T]): Seq[String] = {
     if (list == null) return null
     list.map(onlyId)
+  }
+
+  def refineResponse(fields: (String, JsValueWrapper)*): JsObject = {
+    val nullableFields = fields.map(tuple => {
+      val (key, value) = tuple
+      val nullableValue: JsValueWrapper = if (value == null) JsNull else value
+      (key, nullableValue)
+    })
+    Json.obj(nullableFields: _*)
   }
 }

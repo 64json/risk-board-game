@@ -1,12 +1,16 @@
 package models.interface
 
+import common.Utils._
 import models.Player
-import play.api.libs.json._
+import play.api.libs.json.Json.JsValueWrapper
 
 import scala.collection.mutable.ArrayBuffer
 
 trait Receivable {
   def receivers: ArrayBuffer[Player]
 
-  def send(message: JsValue) = receivers.foreach(_.receiver ! message)
+  def send(fields: (String, JsValueWrapper)*): Unit = {
+    val response = refineResponse(fields: _*)
+    receivers.foreach(_.receiver ! response)
+  }
 }

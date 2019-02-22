@@ -1,14 +1,17 @@
 package controllers
 
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import common.Utils._
 import controllers.SocketActor.Action
 import models.interface.Receivable
 import models.{Game, Player}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 object SocketActor extends Receivable {
   def props(receiver: ActorRef) = Props(new SocketActor(receiver))
@@ -31,14 +34,33 @@ object SocketActor extends Receivable {
 
   override def receivers: ArrayBuffer[Player] = players
 
-  // TODO: periodically send out list of games{id, name, owner, playing, players} and players{id, name, game}
+  val system = ActorSystem()
+  system.scheduler.schedule(0 seconds, 1 seconds) {
+    players.foreach(player => {
+      if (player.game == null) {
+        player.send( // TODO: don't send unnecessary information
+          "games" -> games,
+          "players" -> players,
+        )
+      }
+    })
+  }
 }
 
 class SocketActor(receiver: ActorRef) extends Actor {
   var player: Player = _
 
+  send("connected" -> true)
+
+  def send(fields: (String, JsValueWrapper)*): Unit = {
+    val response = refineResponse(fields: _*)
+    receiver ! response
+  }
+
   override def postStop() {
-    unregister(_)
+    unregister _
+
+    send("connected" -> false)
   }
 
   override def receive: Receive = {
@@ -49,10 +71,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
         findMethod(action.method)(action.args)
       } catch {
         case e: Error =>
-          e.printStackTrace()
-          receiver ! Json.obj(
-            "error" -> e.getMessage
-          )
+          send("error" -> e.getMessage)
       }
   }
 
@@ -74,9 +93,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
     player = new Player(playerName, receiver)
     SocketActor.players += player
 
-    player.send(Json.obj(
-      "player" -> player
-    ))
+    send("player" -> player)
   }
 
   def unregister(args: List[JsValue]): Unit = {
@@ -85,9 +102,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
     if (player.game != null) player.game.leave(player)
     player = null
 
-    receiver ! Json.obj(
-      "player" -> player
-    )
+    send("player" -> player)
   }
 
   def createGame(args: List[JsValue]): Unit = {
@@ -96,9 +111,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
     val game = new Game(gameName, player)
     SocketActor.games += game
 
-    game.send(Json.obj(
-      "game" -> game
-    ))
+    game.send("game" -> game)
   }
 
   def joinGame(args: List[JsValue]): Unit = {
@@ -107,9 +120,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
     val game = SocketActor.findGame(gameId)
     game.join(player)
 
-    game.send(Json.obj(
-      "game" -> game
-    ))
+    game.send("game" -> game)
   }
 
   def leaveGame(args: List[JsValue]): Unit = {
@@ -118,9 +129,8 @@ class SocketActor(receiver: ActorRef) extends Actor {
     val game = SocketActor.findGame(gameId)
     game.leave(player)
 
-    game.send(Json.obj(
-      "game" -> game
-    ))
+    game.send("game" -> game)
+    player.send("game" -> null)
   }
 
   def startGame(args: List[JsValue]): Unit = {
@@ -130,8 +140,6 @@ class SocketActor(receiver: ActorRef) extends Actor {
     if (game.owner != player) throw new Error("Only owner can start the game.")
     game.start()
 
-    game.send(Json.obj(
-      "game" -> game
-    ))
+    game.send("game" -> game)
   }
 }

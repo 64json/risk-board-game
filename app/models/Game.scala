@@ -18,6 +18,8 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
 
   override def format: JsValue = Json.obj(
     "id" -> JsString(id),
+    "name" -> JsString(name),
+    "owner" -> JsString(onlyId(owner)),
     "playing" -> JsBoolean(playing),
     "players" -> toJson(players),
     "turns" -> toJson(onlyIds(turns)),

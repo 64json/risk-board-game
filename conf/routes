@@ -3,9 +3,6 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET        /*path/         controllers.Application.untrail(path)
-GET        /connect        controllers.Application.connect
-
-# Map static resources from the /public folder to the /assets URL path
-GET        /               controllers.Assets.at(path="/public", file="index.html")
-GET        /*file          controllers.Assets.at(path="/public", file)
+GET        /              controllers.Application.index()
+GET        /api/ws        controllers.Application.ws
+GET        /*file         controllers.Application.assetOrDefault(file)
