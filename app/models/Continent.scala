@@ -10,7 +10,7 @@ class Continent(val name: String, val territories: List[Territory]) extends Iden
   override def format: JsValue = Json.obj(
     "id" -> JsString(id),
     "name" -> JsString(name),
-    "territories" -> toJson(territories),
+    "territories" -> toJson(onlyId(territories)),
   )
 }
 

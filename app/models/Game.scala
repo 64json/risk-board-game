@@ -1,15 +1,16 @@
 package models
 
 import common.Utils._
-import models.interface.{Formattable, Identifiable}
+import controllers.SocketActor
+import models.interface.{Formattable, Identifiable, Receivable}
 import play.api.libs.json._
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Game(val name: String, var owner: Player) extends Identifiable with Formattable {
+class Game(val name: String, var owner: Player) extends Identifiable with Formattable with Receivable {
   var playing = false
-  val players = ListBuffer(owner)
+  val players = ArrayBuffer(owner)
   var turns: List[Player] = _
   var turnIndex: Int = _
   var continents: List[Continent] = _
@@ -18,22 +19,29 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
   override def format: JsValue = Json.obj(
     "id" -> JsString(id),
     "playing" -> JsBoolean(playing),
-    "players" -> toJson(players),
-    "turns" -> toJson(turns),
+    "players" -> toJson(onlyId(players)),
+    "turns" -> toJson(onlyId(turns)),
     "turnIndex" -> JsNumber(turnIndex),
-    "continents" -> toJson(continents),
-    "territories" -> toJson(territories),
+    "continents" -> toJson(onlyId(continents)),
+    "territories" -> toJson(onlyId(territories)),
   )
 
-  def addPlayer(player: Player): Unit = {
+  override def receivers = players
+
+  def join(player: Player): Unit = {
+    if (player.game != null) throw new Error("The player is already in a game.")
     if (playing) throw new Error("Unable to add a player during the game.")
     if (players.length >= 6) throw new Error("Too many players.")
 
     players += player
+    player.game = this
   }
 
-  def removePlayer(player: Player): Unit = {
+  def leave(player: Player): Unit = {
+    if (player.game != this) throw new Error("The player is not in the game.")
+
     players -= player
+    player.game = null
     if (players.isEmpty) {
       destroy()
       return
@@ -49,8 +57,7 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
     }
   }
 
-  def start() = {
-    // TODO: only owner can start
+  def start(): Unit = {
     if (players.length < 3) throw new Error("Not enough players.")
     if (players.length > 6) throw new Error("Too many players.")
 
@@ -60,10 +67,10 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
     turns = Random.shuffle(players.toList)
     turnIndex = 0
     continents = Continent.createContinents
-    territories = continents.flatMap(continent => continent.territories)
+    territories = continents.flatMap(_.territories)
   }
 
-  def destroy() = {
-    // TODO: remove from game list
+  def destroy(): Unit = {
+    SocketActor.games -= this
   }
 }

@@ -1,11 +1,15 @@
 package controllers
 
-import akka.stream.scaladsl.Flow
+import akka.actor.ActorSystem
+import akka.stream.Materializer
 import javax.inject._
+import play.api.libs.json.JsValue
+import play.api.libs.streams.ActorFlow
+import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.mvc._
 
 @Singleton
-class Application @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class Application @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
   def untrail(path: String) = Action {
     MovedPermanently("/" + path)
   }
@@ -14,7 +18,11 @@ class Application @Inject()(cc: ControllerComponents) extends AbstractController
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def connect = WebSocket.accept[String, String] {
-    request => Flow[String].map(_ + " Back")
+  implicit val transformer = MessageFlowTransformer.jsonMessageFlowTransformer
+
+  def connect = WebSocket.accept[JsValue, JsValue] { request =>
+    ActorFlow.actorRef { out =>
+      SocketActor.props(out)
+    }
   }
 }
