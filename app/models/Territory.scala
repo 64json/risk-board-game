@@ -8,18 +8,18 @@ import scala.collection.mutable.ListBuffer
 
 class Territory(val name: String) extends Identifiable with Formattable {
   val adjacencyTerritories: ListBuffer[Territory] = ListBuffer()
-  var owner: Player = _
-  var armies = 0
+  var owner: Option[Player] = None
+  var armies: Option[Int] = None
 
   def border(territories: Territory*): Unit = {
     adjacencyTerritories ++= territories
   }
 
-  override def format: JsValue = Json.obj(
-    "id" -> JsString(id),
-    "name" -> JsString(name),
-    "adjacencyTerritories" -> toJson(onlyIds(adjacencyTerritories)),
-    "owner" -> JsString(onlyId(owner)),
-    "armies" -> JsNumber(armies),
+  override def format: JsValue = jsonObject(
+    "id" -> id,
+    "name" -> name,
+    "adjacencyTerritories" -> onlyIds(adjacencyTerritories),
+    "owner" -> onlyId(owner),
+    "armies" -> armies,
   )
 }

@@ -11,38 +11,38 @@ import scala.util.Random
 class Game(val name: String, var owner: Player) extends Identifiable with Formattable with Receivable {
   var playing = false
   val players: ArrayBuffer[Player] = ArrayBuffer()
-  var turns: List[Player] = _
-  var turnIndex: Int = _
-  var continents: List[Continent] = _
+  var turns: Option[List[Player]] = None
+  var turnIndex: Option[Int] = None
+  var continents: Option[List[Continent]] = None
   join(owner)
 
-  override def format: JsValue = Json.obj(
-    "id" -> JsString(id),
-    "name" -> JsString(name),
-    "owner" -> JsString(onlyId(owner)),
-    "playing" -> JsBoolean(playing),
-    "players" -> toJson(players),
-    "turns" -> toJson(onlyIds(turns)),
-    "turnIndex" -> JsNumber(turnIndex),
-    "continents" -> toJson(continents),
+  override def format: JsValue = jsonObject(
+    "id" -> id,
+    "name" -> name,
+    "owner" -> onlyId(owner),
+    "playing" -> playing,
+    "players" -> players,
+    "turns" -> onlyIds(turns),
+    "turnIndex" -> turnIndex,
+    "continents" -> continents,
   )
 
   override def receivers: ArrayBuffer[Player] = players
 
   def join(player: Player): Unit = {
-    if (player.game != null) throw new Error("The player is already in a game.")
+    if (player.game.isDefined) throw new Error("The player is already in a game.")
     if (playing) throw new Error("Unable to add a player during the game.")
     if (players.length >= 6) throw new Error("Too many players.")
 
     players += player
-    player.game = this
+    player.game = Some(this)
   }
 
   def leave(player: Player): Unit = {
-    if (player.game != this) throw new Error("The player is not in the game.")
+    if (!player.game.contains(this)) throw new Error("The player is not in the game.")
 
     players -= player
-    player.game = null
+    player.game = None
     if (players.isEmpty) {
       destroy()
       return
@@ -64,10 +64,10 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
 
     playing = true
     val assignedArmies = 20 + (6 - players.length) * 5
-    players.foreach(player => player.assignedArmies = assignedArmies)
-    turns = Random.shuffle(players.toList)
-    turnIndex = 0
-    continents = Continent.createContinents
+    players.foreach(player => player.assignedArmies = Some(assignedArmies))
+    turns = Some(Random.shuffle(players.toList))
+    turnIndex = Some(0)
+    continents = Some(Continent.createContinents)
   }
 
   def destroy(): Unit = {

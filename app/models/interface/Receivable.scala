@@ -10,7 +10,7 @@ trait Receivable {
   def receivers: ArrayBuffer[Player]
 
   def send(fields: (String, JsValueWrapper)*): Unit = {
-    val response = refineResponse(fields: _*)
+    val response = jsonObject(fields: _*)
     receivers.foreach(_.receiver ! response)
   }
 }

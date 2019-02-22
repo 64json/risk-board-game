@@ -116,12 +116,9 @@ class App extends Component {
                             Players: {game.players.map(player => player.name).join(', ')}
                           </div>
                           <div>
-                            Owner: {game.players.map(player => player.name).join(', ')}
-                          </div>
-                          <div>
                             <div>
                               {
-                                game.playing ? 'Playing' : 'Waiting'
+                                game.playing ? 'Playing ...' : 'Waiting ...'
                               }
                             </div>
                             {
