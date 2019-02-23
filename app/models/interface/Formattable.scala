@@ -10,7 +10,7 @@ trait Formattable {
   def apply(keyObjs: Any*): JsValue = format(keyObjs: _*)
 
   def format(keyObjs: Any*): JsValue = {
-    val formattedFields: Seq[(String, JsValueWrapper)] = keyObjs.map(keyObj => {
+    val formattedFields: Seq[(String, JsValueWrapper)] = ("id" :: keyObjs.toList).map(keyObj => {
       var jsonKey: String = null
       var jsonValue: JsValueWrapper = null
       keyObj match {

@@ -27,21 +27,46 @@ class App extends Component {
         console.error(data.error);
       } else {
         const risk = JSON.parse(JSON.stringify(this.state.risk));
-        console.log({risk, data});
 
         const isObject = obj => obj && obj.constructor === {}.constructor;
+        const isArray = obj => obj && obj.constructor === [].constructor;
 
         const deepMerge = (dist, src) => {
           Object.keys(src).forEach(key => {
             const value = src[key];
-            if (isObject(dist[key]) && isObject(value)) {
-              deepMerge(dist[key], value);
+            if (isArray(dist[key]) && isArray(value)) {
+              if (dist[key].length) {
+                if (isObject(dist[key][0])) {
+                  dist[key] = value.map(e => {
+                    if (isObject(e)) {
+                      const object = dist[key].find(object => object.id === e.id) || {};
+                      deepMerge(object, e);
+                      return object;
+                    } else {
+                      return dist[key].find(object => object.id === e);
+                    }
+                  });
+                } else {
+                  dist[key] = value;
+                }
+              } else {
+                dist[key] = value;
+              }
+            } else if (isObject(dist[key]) && isObject(value)) {
+              if (dist[key].id === value.id) {
+                deepMerge(dist[key], value);
+              } else {
+                dist[key] = value;
+              }
             } else {
               dist[key] = value;
             }
           });
         };
         deepMerge(risk, data);
+
+        console.log({risk});
+
         this.setState({risk});
       }
     };
