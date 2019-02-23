@@ -3,21 +3,15 @@ import {BrowserRouter as Router} from 'react-router-dom';
 
 import './App.css';
 
-const Tech = ({match}) => {
-  return <div>Current Route: {match.params.tech}</div>;
-};
-
-
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       risk: {
         connected: false,
-        player: null,
-        game: null,
-        players: [],
+        user: null,
         games: [],
+        game: null,
       },
       playerName: '',
       gameName: '',
@@ -32,8 +26,22 @@ class App extends Component {
         alert(data.error);
         console.error(data.error);
       } else {
-        console.log(data);
-        const risk = {...this.state.risk, ...data};
+        const risk = JSON.parse(JSON.stringify(this.state.risk));
+        console.log({risk, data});
+
+        const isObject = obj => obj && obj.constructor === {}.constructor;
+
+        const deepMerge = (dist, src) => {
+          Object.keys(src).forEach(key => {
+            const value = src[key];
+            if (isObject(dist[key]) && isObject(value)) {
+              deepMerge(dist[key], value);
+            } else {
+              dist[key] = value;
+            }
+          });
+        };
+        deepMerge(risk, data);
         this.setState({risk});
       }
     };
@@ -83,7 +91,7 @@ class App extends Component {
 
   render() {
     const {playerName, gameName} = this.state;
-    const {connected, player, game, games} = this.state.risk;
+    const {connected, user, player, game, games} = this.state.risk;
 
     return (
       <Router>
@@ -94,7 +102,7 @@ class App extends Component {
             connected &&
             <div>
               {
-                player == null ?
+                user == null ?
                   <div>
                     <input type="text" value={playerName}
                            placeholder="Player Name"
@@ -103,7 +111,7 @@ class App extends Component {
                   </div> :
                   <div>
                     <div>
-                      Player: {player.name}
+                      User: {user.name}
                     </div>
                     <hr/>
                     {
@@ -117,12 +125,11 @@ class App extends Component {
                               <div>
                                 Players: {
                                 game.players
-                                  .sort((p1, p2) => game.turns.indexOf(p1.id) - game.turns.indexOf(p2.id))
-                                  .map(player => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${game.turns.indexOf(player.id)})`).join(', ')
+                                  .map((player, i) => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${i + 1})`).join(', ')
                               }
                               </div> :
                               <div>
-                                Players: {game.players.map(player => `${player.name}`).join(', ')}
+                                Players: {game.players.map(player => `${player.name}${player.id === game.owner ? ' (owner) ' : ''}`).join(', ')}
                               </div>
                           }
                           <div>
@@ -132,7 +139,7 @@ class App extends Component {
                               }
                             </div>
                             {
-                              player.id === game.owner && !game.playing &&
+                              user.player === game.owner && !game.playing &&
                               <button onClick={this.handleStartGame}>
                                 Start
                               </button>

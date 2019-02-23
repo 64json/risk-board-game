@@ -1,7 +1,6 @@
 package common
 
 import models.interface.Identifiable
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
 object Utils {
@@ -27,9 +26,5 @@ object Utils {
   def onlyIds[T <: Identifiable](list: Option[Seq[T]]): Option[Seq[String]] = {
     if (list.isEmpty) return None
     Some(list.get.map(obj => onlyId(obj)))
-  }
-
-  def jsonObject(fields: (String, JsValueWrapper)*): JsObject = {
-    Json.obj(fields: _*)
   }
 }

@@ -4,12 +4,11 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import common.Utils._
 import controllers.SocketActor.Action
 import models.interface.Receivable
-import models.{Game, Player}
+import models.{Game, User}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
@@ -23,8 +22,8 @@ object SocketActor extends Receivable {
       (JsPath \ "args").read[List[JsValue]]
     ) (Action.apply _)
 
-  val games: ArrayBuffer[Game] = ArrayBuffer()
-  val players: ArrayBuffer[Player] = ArrayBuffer()
+  var games: List[Game] = List()
+  var users: List[User] = List()
 
   def findGame(gameId: String): Game = {
     val option = games.find(game => game.id == gameId)
@@ -32,28 +31,34 @@ object SocketActor extends Receivable {
     option.get
   }
 
-  override def receivers: ArrayBuffer[Player] = players
+  override def receivers: List[User] = users
 
   val system = ActorSystem()
   system.scheduler.schedule(0 seconds, 1 seconds) {
-    players.foreach(player => {
-      if (player.game.isEmpty) {
-        player.send( // TODO: don't send unnecessary information
-          "games" -> games,
-          "players" -> players,
-        )
+    users.foreach(user => {
+      if (user.game.isEmpty) {
+        user.send("games" -> games.map(_ (
+          "id",
+          "name",
+          "playing",
+          "players" -> List(
+            "id",
+            "name"
+          ),
+          "owner"
+        )))
       }
     })
   }
 }
 
 class SocketActor(receiver: ActorRef) extends Actor {
-  var player: Option[Player] = None
+  var user: Option[User] = None
 
   send("connected" -> true)
 
   def send(fields: (String, JsValueWrapper)*): Unit = {
-    val response = jsonObject(fields: _*)
+    val response = Json.obj(fields: _*)
     receiver ! response
   }
 
@@ -67,7 +72,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
     case msg: JsValue =>
       val action = msg.as[Action]
       try {
-        if (player.isEmpty && action.method != "register") throw new Error("The player must be registered first.")
+        if (user.isEmpty && action.method != "register") throw new Error("The player must be registered first.")
         findMethod(action.method)(action.args)
       } catch {
         case e: Error =>
@@ -89,57 +94,130 @@ class SocketActor(receiver: ActorRef) extends Actor {
   def register(args: List[JsValue]): Unit = {
     val playerName = typed[String](args)
 
-    if (player.isDefined) throw new Error("Already registered.")
-    player = Some(new Player(playerName, receiver))
-    SocketActor.players += player.get
+    if (user.isDefined) throw new Error("Already registered.")
+    user = Some(new User(playerName, receiver))
+    SocketActor.users :+= user.get
 
-    send("player" -> player)
+    send(
+      "user" -> user.get(
+        "name"
+      )
+    )
   }
 
   def unregister(args: List[JsValue]): Unit = {
-    if (player.isEmpty) throw new Error("Already unregistered.")
-    SocketActor.players -= player.get
-    if (player.get.game.isDefined) player.get.game.get.leave(player.get)
-    player = None
+    if (user.isEmpty) throw new Error("Already unregistered.")
+    SocketActor.users = SocketActor.users.filter(_ != user.get)
+    val player = user.get.player
+    val game = user.get.game
+    if (player.isDefined && game.isDefined) game.get.leave(player.get)
+    user = None
 
-    send("player" -> player)
+    send(
+      "user" -> JsNull
+    )
   }
 
   def createGame(args: List[JsValue]): Unit = {
     val gameName = typed[String](args)
 
-    val game = new Game(gameName, player.get)
-    SocketActor.games += game
+    val game = new Game(gameName, user.get)
+    SocketActor.games :+= game
 
-    game.send("game" -> game)
+    send(
+      "user" -> user.get(
+        "game",
+        "player"
+      )
+    )
+    game.send(
+      "game" -> game(
+        "id",
+        "name",
+        "playing",
+        "players" -> List(
+          "id",
+          "name"
+        ),
+        "owner"
+      )
+    )
   }
 
   def joinGame(args: List[JsValue]): Unit = {
     val gameId = typed[String](args)
 
     val game = SocketActor.findGame(gameId)
-    game.join(player.get)
+    game.join(user.get)
 
-    game.send("game" -> game)
+    send(
+      "user" -> user.get(
+        "game",
+        "player"
+      )
+    )
+    game.send(
+      "game" -> game(
+        "id",
+        "name",
+        "playing",
+        "players" -> List(
+          "id",
+          "name"
+        ),
+        "owner"
+      )
+    )
   }
 
   def leaveGame(args: List[JsValue]): Unit = {
     val gameId = typed[String](args)
 
     val game = SocketActor.findGame(gameId)
-    game.leave(player.get)
+    game.leave(user.get.player.get)
 
-    game.send("game" -> game)
-    player.get.send("game" -> JsNull)
+    send(
+      "user" -> user.get(
+        "game",
+        "player"
+      ),
+      "game" -> JsNull
+    )
+    game.send(
+      "game" -> game(
+        "players" -> List(
+          "id",
+          "name"
+        )
+      )
+    )
   }
 
   def startGame(args: List[JsValue]): Unit = {
     val gameId = typed[String](args)
 
     val game = SocketActor.findGame(gameId)
-    if (game.owner != player.get) throw new Error("Only owner can start the game.")
+    if (game.owner.user != user.get) throw new Error("Only owner can start the game.")
     game.start()
 
-    game.send("game" -> game)
+    game.send(
+      "game" -> game(
+        "playing",
+        "players" -> List(
+          "id",
+          "name",
+          "assignedArmies"
+        ),
+        "continents" -> List(
+          "id",
+          "name",
+          "territories" -> List(
+            "id",
+            "name",
+            "adjacencyTerritories"
+          )
+        )
+      )
+    )
   }
 }
