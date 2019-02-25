@@ -4,11 +4,18 @@ import common.Utils._
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
+/*
+ serializes objects/classes into JSON format
+ what is JSON? https://www.w3schools.com/whatis/whatis_json.asp
+  */
 trait Formattable {
+  // defines a map from field name to its value
   def fields: Map[String, Any]
 
+  // syntax sugar to call format method
   def apply(keyObjs: Any*): JsValue = format(keyObjs: _*)
 
+  // serializes the specified fields into JSON object
   def format(keyObjs: Any*): JsValue = {
     val formattedFields: Seq[(String, JsValueWrapper)] = ("id" :: keyObjs.toList).map(keyObj => {
       var jsonKey: String = null
@@ -58,6 +65,7 @@ trait Formattable {
 
 object Formattable {
 
+  // lets Play framework know that this object is serializable
   implicit object FormattableFormat extends Format[Formattable] {
     override def writes(formattable: Formattable): JsValue = formattable.format()
 

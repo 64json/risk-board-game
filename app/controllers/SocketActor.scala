@@ -12,10 +12,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 object SocketActor extends Receivable {
+  // creates an SocketActor object for each client
   def props(receiver: ActorRef) = Props(new SocketActor(receiver))
 
   case class Action(method: String, args: List[JsValue])
 
+  // deserializes JSON message from client
   implicit val ActionReads: Reads[Action] = (
     (JsPath \ "method").read[String] and
       (JsPath \ "args").read[List[JsValue]]
@@ -33,6 +35,7 @@ object SocketActor extends Receivable {
   override def receivers: List[User] = users
 
   val system = ActorSystem()
+  // periodically sends out the list of rooms to users in lobby
   system.scheduler.schedule(0 seconds, 1 seconds) {
     users.foreach(user => {
       if (user.game.isEmpty) {
@@ -50,6 +53,7 @@ object SocketActor extends Receivable {
     })
   }
 
+  // unregistered user
   case class Guest(override val receiver: ActorRef) extends User(None, receiver)
 
 }
@@ -59,12 +63,14 @@ class SocketActor(receiver: ActorRef) extends Actor {
 
   user.send("connected" -> true)
 
+  // unregisters the user after socket closes
   override def postStop() { // TODO: does it work?
     unregister _
 
     user.send("connected" -> false)
   }
 
+  // processes message received from client
   override def receive: Receive = {
     case msg: JsValue =>
       val action = msg.as[Action]
@@ -79,6 +85,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
       }
   }
 
+  // maps method name to the actual method
   def findMethod(method: String): List[JsValue] => Unit = {
     method match {
       case "register" => register

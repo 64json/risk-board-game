@@ -1,6 +1,5 @@
 package models
 
-import common.Utils._
 import models.interface.Identifiable
 
 class Territory(val name: String) extends Identifiable {

@@ -31,6 +31,7 @@ class App extends Component {
         const isObject = obj => obj && obj.constructor === {}.constructor;
         const isArray = obj => obj && obj.constructor === [].constructor;
 
+        // merge updates into the risk object in this.state
         const deepMerge = (dist, src) => {
           Object.keys(src).forEach(key => {
             const value = src[key];
