@@ -17,64 +17,64 @@ class Continent(val name: String, val territories: List[Territory]) extends Iden
 object Continent {
   def createContinents: List[Continent] = {
     // Refer to https://en.wikipedia.org/wiki/Risk_(game)#/media/File:Risk_game_map_fixed.png
-    val NORTH_AMERICA = new Continent("North America", List(
-      "Alaska",
-      "Alberta",
-      "Central America",
-      "Eastern United States",
-      "Greenland",
-      "Northwest Territory",
-      "Ontario",
-      "Quebec",
-      "Western United States",
+    val NORTH_AMERICA = new Continent("Great Cities", List(
+      "San Fransokyo",
+      "Hawaii",
+      "New Orleans",
+      "The Bayeux",
+      "Notre Dame",
+      "Court of Miracles",
+      "Arendelle",
+      "Elsa's Castle",
+      "London",
     ).map(name => new Territory(name)))
 
-    val SOUTH_AMERICA = new Continent("South America", List(
-      "Argentina",
-      "Brazil",
-      "Peru",
-      "Venezuela",
+    val SOUTH_AMERICA = new Continent("Lands Unknown", List(
+      "Cusco Castle",
+      "Pacha's House",
+      "Yzma's Lair",
+      "Neverland",
     ).map(name => new Territory(name)))
 
-    val EUROPE = new Continent("Europe", List(
-      "Great Britain",
-      "Iceland",
-      "Northern Europe",
-      "Scandinavia",
-      "Southern Europe",
-      "Ukraine",
-      "Western Europe",
+    val EUROPE = new Continent("The Realm of Warriors", List(
+      "Great Wall of China",
+      "Imperial City",
+      "Agrabah",
+      "The Cave of Wonders",
+      "Athens",
+      "Mount Olympus",
+      "The Underworld",
     ).map(name => new Territory(name)))
 
-    val AFRICA = new Continent("Africa", List(
-      "Congo",
-      "East Africa",
-      "Egypt",
-      "Madagascar",
-      "North Africa",
-      "South Africa",
+    val AFRICA = new Continent("Land of the Fittest", List(
+      "The Pridelands",
+      "The Ele[hant Graveyard",
+      "Timon and Pumba's Hideout",
+      "Gaston's Tavern",
+      "Beast's Castle",
+      "Belle's Cottage",
     ).map(name => new Territory(name)))
 
-    val ASIA = new Continent("Asia", List(
-      "Afghanistan",
-      "China",
-      "India",
-      "Irkutsk",
-      "Japan",
-      "Kamchatka",
-      "Middle East",
-      "Mongolia",
-      "Siam",
-      "Siberia",
-      "Ural",
-      "Yakutsk",
+    val ASIA = new Continent("The Realm of Princesses", List(
+      "Evil Queen's Castle",
+      "Dwarves' Cottage",
+      "Maleficent's Castle",
+      "Fairies' Cottage",
+      "Charming Palace",
+      "Cinderella's House",
+      "Rapunzel's Tower",
+      "Corona",
+      "Atlantis",
+      "Atlantica",
+      "Ariel's Grotto",
+      "Eric's Castle",
     ).map(name => new Territory(name)))
 
-    val AUSTRALIA = new Continent("Australia", List(
-      "Eastern Australia",
-      "Indonesia",
-      "New Guinea",
-      "Western Australia",
+    val AUSTRALIA = new Continent("Wayfinders' Islands", List(
+      "Motonui",
+      "Te Fiti",
+      "Maui's Island",
+      "Realm of Monsters",
     ).map(name => new Territory(name)))
 
     NORTH_AMERICA(1).border(

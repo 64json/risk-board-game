@@ -33,6 +33,7 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
     if (player.game.isDefined) throw new Error("The player is already in a game.")
     if (playing) throw new Error("Unable to add a player during the game.")
     if (players.length >= 6) throw new Error("Too many players.")
+    //TODO: if (player.name.equals(other player's name in the game)) throw new Error("That name is taken in this game")
 
     players += player
     player.game = Some(this)

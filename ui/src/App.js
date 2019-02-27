@@ -118,8 +118,8 @@ class App extends Component {
                                 Players: {
                                 game.players
                                   .sort((p1, p2) => game.turns.indexOf(p1.id) - game.turns.indexOf(p2.id))
-                                  .map(player => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${game.turns.indexOf(player.id)})`).join(', ')
-                              }
+                                  .map(player => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${game.turns.indexOf(player.id) + 1})`).join(', ')
+                              } //changed turns to start from 1, so for 6 players a game has players 1 to 6
                               </div> :
                               <div>
                                 Players: {game.players.map(player => `${player.name}`).join(', ')}
