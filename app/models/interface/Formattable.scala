@@ -24,7 +24,7 @@ trait Formattable {
         case (key: String, keyObjs: List[Any]) =>
           jsonKey = key
           val value = fields.get(key)
-          if (value.isEmpty) throw new Error("The key is not found")
+          if (value.isEmpty) throw new Error(s"The key '$key' is not found")
           jsonValue = value.get match {
             case None => JsNull
 
@@ -38,7 +38,7 @@ trait Formattable {
         case key: String =>
           jsonKey = key
           val value = fields.get(key)
-          if (value.isEmpty) throw new Error("The key is not found")
+          if (value.isEmpty) throw new Error(s"The key '$key' is not found")
           jsonValue = value.get match {
             case None => JsNull
 

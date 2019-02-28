@@ -33,7 +33,7 @@ class Application @Inject()(assets: Assets, errorHandler: HttpErrorHandler, conf
     */
   def ws = WebSocket.accept[JsValue, JsValue] { request =>
     ActorFlow.actorRef { out =>
-      SocketActor.props(out)
+      Client.props(out)
     }
   }
 }

@@ -1,14 +1,14 @@
 package models
 
-import controllers.SocketActor
+import controllers.Client
 import models.interface.{Identifiable, Receivable}
 
 import scala.util.Random
 
-class Game(val name: String, var user: User) extends Identifiable with Receivable {
+class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: Game => Unit) extends Identifiable with Receivable {
   var playing = false
   var players: List[Player] = List()
-  var owner: Player = join(user)
+  var owner: Player = join(ownerName, ownerClient)
   var turnIndex: Option[Int] = None
   var continents: Option[List[Continent]] = None
 
@@ -22,16 +22,15 @@ class Game(val name: String, var user: User) extends Identifiable with Receivabl
     "continents" -> continents,
   )
 
-  override def receivers: List[User] = players.map(_.user)
+  override def receivers: List[Client] = players.map(_.client)
 
-  def join(user: User): Player = {
-    if (players.exists(_.user == user)) throw new Error("The user is already in the game.")
+  def join(playerName: String, playerClient: Client): Player = {
+    if (players.exists(_.client == playerClient)) throw new Error("The client is already in the game.")
     if (playing) throw new Error("Unable to join while playing.")
     if (players.length >= 6) throw new Error("Too many players.")
+    if (players.exists(_.name == playerName)) throw new Error("The player name is already in use.")
 
-    val player = new Player(user)
-    player.user.game = Some(this)
-    player.user.player = Some(player)
+    val player = new Player(playerName, playerClient)
     players :+= player
     player
   }
@@ -39,8 +38,6 @@ class Game(val name: String, var user: User) extends Identifiable with Receivabl
   def leave(player: Player): Unit = {
     if (!players.contains(player)) throw new Error("The player is not in the game.")
 
-    player.user.game = None
-    player.user.player = None
     players = players.filter(_ != player)
     if (players.isEmpty) {
       destroy()
@@ -69,7 +66,5 @@ class Game(val name: String, var user: User) extends Identifiable with Receivabl
     continents = Some(Continent.createContinents)
   }
 
-  def destroy(): Unit = {
-    SocketActor.games = SocketActor.games.filter(_ != this)
-  }
+  def destroy(): Unit = onDestroy(this)
 }
