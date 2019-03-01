@@ -10,6 +10,8 @@ class Continent(val name: String, val territories: List[Territory]) extends Iden
     "name" -> name,
     "territories" -> territories,
   )
+
+  def getTerritories: List[Territory] = territories
 }
 
 object Continent {

@@ -2,10 +2,12 @@ import React, {Component} from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
 
 import './App.css';
+import Continent from './Continent';
 
 class App extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       risk: {
         connected: false,
@@ -97,13 +99,15 @@ class App extends Component {
   };
 
   handleStartGame = () => {
-    const {game} = this.state.risk;
-    this.send('startGame', [game.id]);
+    this.send('startGame', []);
   };
 
   handleLeaveGame = () => {
-    const {game} = this.state.risk;
-    this.send('leaveGame', [game.id]);
+    this.send('leaveGame', []);
+  };
+
+  handleAssignArmies = (territoryId, army) => {
+    this.send('assignArmies', [territoryId, army]);
   };
 
   render() {
@@ -159,17 +163,8 @@ class App extends Component {
                     {
                       game.playing &&
                       game.continents.map(continent => (
-                        <div key={continent.id}>
-                          {continent.name}
-                          {
-                            continent.territories.map(territory => (
-                              <div key={territory.id}>
-                                -- {territory.name}
-                              </div>
-                            ))
-                          }
-                          <br/>
-                        </div>
+                        <Continent continent={continent} game={game}
+                                   onAssignArmies={this.handleAssignArmies}/>
                       ))
                     }
                   </div> :
