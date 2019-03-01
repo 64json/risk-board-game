@@ -11,5 +11,11 @@ class Player(val user: User) extends Identifiable with Receivable {
     "assignedArmies" -> assignedArmies,
   )
 
+  def setAssignedArmies(armies: Int) = {
+    this.assignedArmies = armies
+  }
+
+  def getName: String = user.name
+
   override def receivers: List[User] = List(this.user)
 }

@@ -15,6 +15,7 @@ class App extends Component {
       },
       playerName: '',
       gameName: '',
+      army: 0,
     };
   }
 
@@ -89,8 +90,18 @@ class App extends Component {
     this.send('leaveGame', [game.id]);
   };
 
+  handleAssignArmy = (territoryName, army) => {
+    const {game} = this.state.risk;
+    return this.send('assignArmies', [game.id, territoryName, army]);
+  };
+  handleChangeAssignArmy = e => {
+    const army = e.target.value;
+    this.setState({army});
+  }
+
+
   render() {
-    const {playerName, gameName} = this.state;
+    const {playerName, gameName, army} = this.state;
     const {connected, user, player, game, games} = this.state.risk;
 
     return (
@@ -152,12 +163,26 @@ class App extends Component {
                           {
                             game.playing &&
                             game.continents.map(continent => (
+
                               <div key={continent.id}>
                                 {continent.name}
                                 {
                                   continent.territories.map(territory => (
                                     <div key={territory.id}>
-                                      -- {territory.name}
+
+                                      <input type={"number"} id={"army"}
+                                             placeholder={"# of Armies"}
+                                             onChange={this.handleChangeAssignArmy}/>
+                                      <button
+                                        name={"Assign Army Button"}
+                                        onClick= {() => this.handleAssignArmy(territory.name, army)}>
+                                        Assign
+                                      </button>
+
+                                        {territory.name}
+                                        <div key={territory.id}>
+                                          {territory.armies}
+                                        </div>
                                     </div>
                                   ))
                                 }
@@ -166,7 +191,7 @@ class App extends Component {
                             ))
                           }
                         </div> :
-                        <div>
+                      <div>
                           <div>
                             <input type="text" value={gameName}
                                    placeholder="Game Name"

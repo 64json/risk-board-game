@@ -2,6 +2,7 @@ package models
 
 import controllers.SocketActor
 import models.interface.{Identifiable, Receivable}
+import scala.util.control.Exception.Catch
 
 import scala.util.Random
 
@@ -67,6 +68,28 @@ class Game(val name: String, var user: User) extends Identifiable with Receivabl
     players = Random.shuffle(players)
     turnIndex = Some(0)
     continents = Some(Continent.createContinents)
+  }
+
+  def nextTurn(): Unit = {
+    fields.++:(turnIndex)
+  }
+
+  def getContinents: Option[List[Continent]] = continents
+
+  def assignArmy(player: Player, territory: Territory, armies: Int): IllegalArgumentException = {
+    if (armies > player.assignedArmies) {
+      new IllegalArgumentException("You do not have enough army dudes available.")
+    } else if (territory.getOwner.isEmpty || territory.getOwner.get == player) {
+      territory.setArmies(armies)
+      territory.setOwner(player)
+      player.setAssignedArmies(player.assignedArmies - armies)
+      new IllegalArgumentException("Success!")
+    } else new IllegalArgumentException("This is not " + player.getName + "'s Territory" )
+  }
+
+  def showArmies(x: Option[Int]) = x match {
+    case Some(s) => s
+    case None => 0
   }
 
   def destroy(): Unit = {

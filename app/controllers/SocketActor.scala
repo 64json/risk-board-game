@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import common.Utils._
 import controllers.SocketActor.Action
 import models.interface.Receivable
-import models.{Game, User}
+import models.{Continent, Game, User, Territory}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
@@ -88,6 +88,7 @@ class SocketActor(receiver: ActorRef) extends Actor {
       case "joinGame" => joinGame
       case "leaveGame" => leaveGame
       case "startGame" => startGame
+      case "assignArmies" => assignArmies
     }
   }
 
@@ -219,5 +220,48 @@ class SocketActor(receiver: ActorRef) extends Actor {
         )
       )
     )
+  }
+
+  def getTerritory(game: Game, territory: String): Territory = {
+    val myContinents =  game.getContinents.toArray
+    println("Territory to find: " + territory.substring(1, territory.length - 1))
+    print("my Continents: ")
+    println()
+    val thisTerritory = territory.substring(1, territory.length - 1)
+    for (x <- myContinents) {
+      for (y <- x) {
+        println(y.name)
+        for (z <- y.getTerritories) {
+          print("my Territories")
+          println(z.name)
+
+          if (z.name.equalsIgnoreCase(thisTerritory)) {
+            println("yo")
+            return z
+          }
+        }
+        println()
+      }
+    }
+    new Territory("blah")
+  }
+
+  def assignArmies(args: List[JsValue]): JsString = {
+    val myVals = args.takeRight(2)
+    val gameId = typed[String] (args.take(args.length - 2))
+    val game = SocketActor.findGame(gameId)
+    val army: Int =  typed[Int](myVals.tail)
+    val territoryChosen = getTerritory(game, myVals.head.toString())
+    try {
+      println("We want this one:" + territoryChosen.name)
+      println("And this one" + army)
+      game.assignArmy(user.get.player.get, territoryChosen, army)
+      JsString("Success")
+    } catch {
+      case e: IllegalArgumentException => println(e.getMessage)
+        JsString(e.getMessage)
+      case _: Throwable => println("Something unexpected happened!")
+        JsString("Something unexpected happened!")
+    }
   }
 }
