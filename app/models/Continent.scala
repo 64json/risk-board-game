@@ -239,7 +239,7 @@ object Continent {
       AFRICA(4),          //Gaston's Tavern
     )
 
-    ASIA(1).border(
+    ASIA(1).border( //Evil Queen's Castle's Borders:
       EUROPE(6),
       ASIA(11),
       ASIA(2),
