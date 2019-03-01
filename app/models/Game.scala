@@ -66,5 +66,30 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     continents = Some(Continent.createContinents)
   }
 
+  def nextTurn(): Unit = {
+    fields.++:(turnIndex)
+  }
+
+  def getContinents: Option[List[Continent]] = continents
+
+  def assignArmy(player: Player, territory: Territory, armies: Int) = {
+    if (armies < 1) throw new Error("You need to assign at least one dude.")
+    if (armies > player.assignedArmies) throw new Error("You do not have enough army dudes available.")
+    if (territory.owner.isDefined && territory.owner.get != player) throw new Error(s"This is not ${player.name}'s territory.")
+
+    territory.owner = Some(player)
+    if (territory.armies.isDefined) {
+      territory.armies = Some(territory.armies.get + armies)
+    } else {
+      territory.armies = Some(armies)
+    }
+    player.assignedArmies -= armies
+  }
+
+  def showArmies(x: Option[Int]) = x match {
+    case Some(s) => s
+    case None => 0
+  }
+
   def destroy(): Unit = onDestroy(this)
 }

@@ -11,6 +11,9 @@ object Utils {
   def typedTuple[T0, T1](a: List[JsValue])(implicit t0: Reads[T0], t1: Reads[T1]) =
     (a(0).as[T0], a(1).as[T1])
 
+  def typedTuple[T0, T1, T2](a: List[JsValue])(implicit t0: Reads[T0], t1: Reads[T1], t2: Reads[T2]) =
+    (a(0).as[T0], a(1).as[T1], a(2).as[T2])
+
   // returns id of identifiable object
   def onlyId[T <: Identifiable](obj: T): String = {
     obj.id

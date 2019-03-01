@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import common.Utils._
 import controllers.Client.Action
 import models.interface.{Identifiable, Receivable}
-import models.{Game, Player}
+import models.{Game, Player, Territory}
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 
@@ -84,6 +84,14 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     game.get
   }
 
+  def getTerritory(territoryId: String): Territory = {
+    val game = getGame()
+    game.continents.get.foreach(_.territories.foreach(territory => {
+      if (territory.id == territoryId) return territory
+    }))
+    throw new Error("The territory is not found.")
+  }
+
   // processes message received from client
   override def receive: Receive = {
     case msg: JsValue =>
@@ -91,7 +99,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       try {
         call(action.method, action.args)
       } catch {
-        case e: Error =>
+        case e: Throwable =>
           error = Some(e.getMessage)
           send("error")
       }
@@ -113,6 +121,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       }
       case "startGame" => {
         startGame()
+      }
+      case "assignArmies" => {
+        val (territoryId, army) = typedTuple[String, Int](args)
+        assignArmies(territoryId, army)
       }
     }
   }
@@ -189,7 +201,28 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "name",
           "territories" -> List(
             "name",
-            "adjacencyTerritories"
+            "adjacencyTerritories",
+            "armies"
+          )
+        )
+      )
+    )
+  }
+
+  def assignArmies(territoryId: String, army: Int) = {
+    val game = getGame()
+    val territory = getTerritory(territoryId)
+    game.assignArmy(player.get, territory, army)
+
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "assignedArmies"
+        ),
+        "continents" -> List(
+          "territories" -> List(
+            "owner",
+            "armies"
           )
         )
       )
