@@ -1,22 +1,16 @@
 package models
 
-import akka.actor.ActorRef
-import common.Utils._
-import models.interface.{Formattable, Identifiable, Receivable}
-import play.api.libs.json._
+import controllers.Client
+import models.interface.{Identifiable, Receivable}
 
-import scala.collection.mutable.ArrayBuffer
+class Player(val name: String, val client: Client) extends Identifiable with Receivable {
+  var assignedArmies: Int = 0
 
-class Player(val name: String, val receiver: ActorRef) extends Identifiable with Formattable with Receivable {
-  var game: Option[Game] = None
-  var assignedArmies: Option[Int] = None
-
-  override def format: JsValue = jsonObject(
+  override def fields = Map(
     "id" -> id,
     "name" -> name,
-    "game" -> onlyId(game),
     "assignedArmies" -> assignedArmies,
   )
 
-  override def receivers: ArrayBuffer[Player] = ArrayBuffer(this)
+  override def receivers: List[Client] = List(client)
 }
