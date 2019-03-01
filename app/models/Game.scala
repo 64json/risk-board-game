@@ -67,7 +67,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   }
 
   def nextTurn(): Unit = {
-    fields.++:(turnIndex)
+    turnIndex = Some(turnIndex.get + 1)
   }
 
   def getContinents: Option[List[Continent]] = continents
