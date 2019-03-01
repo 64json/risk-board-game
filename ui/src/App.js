@@ -3,23 +3,16 @@ import {BrowserRouter as Router} from 'react-router-dom';
 
 import './App.css';
 
-const Tech = ({match}) => {
-  return <div>Current Route: {match.params.tech}</div>;
-};
-
-
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       risk: {
         connected: false,
-        player: null,
-        game: null,
-        players: [],
         games: [],
+        game: null,
+        player: null,
       },
-      playerName: '',
       gameName: '',
     };
   }
@@ -32,8 +25,48 @@ class App extends Component {
         alert(data.error);
         console.error(data.error);
       } else {
-        console.log(data);
-        const risk = {...this.state.risk, ...data};
+        const risk = JSON.parse(JSON.stringify(this.state.risk));
+
+        const isObject = obj => obj && obj.constructor === {}.constructor;
+        const isArray = obj => obj && obj.constructor === [].constructor;
+
+        // merge updates into the risk object in this.state
+        const deepMerge = (dist, src) => {
+          Object.keys(src).forEach(key => {
+            const value = src[key];
+            if (isArray(dist[key]) && isArray(value)) {
+              if (dist[key].length) {
+                if (isObject(dist[key][0])) {
+                  dist[key] = value.map(e => {
+                    if (isObject(e)) {
+                      const object = dist[key].find(object => object.id === e.id) || {};
+                      deepMerge(object, e);
+                      return object;
+                    } else {
+                      return dist[key].find(object => object.id === e);
+                    }
+                  });
+                } else {
+                  dist[key] = value;
+                }
+              } else {
+                dist[key] = value;
+              }
+            } else if (isObject(dist[key]) && isObject(value)) {
+              if (dist[key].id === value.id) {
+                deepMerge(dist[key], value);
+              } else {
+                dist[key] = value;
+              }
+            } else {
+              dist[key] = value;
+            }
+          });
+        };
+        deepMerge(risk, data);
+
+        console.log(risk);
+
         this.setState({risk});
       }
     };
@@ -47,28 +80,20 @@ class App extends Component {
     this.ws.send(JSON.stringify({method, args}));
   }
 
-  handleChangePlayerName = e => {
-    const playerName = e.target.value;
-    this.setState({playerName});
-  };
-
   handleChangeGameName = e => {
     const gameName = e.target.value;
     this.setState({gameName});
   };
 
-  handleRegister = e => {
-    const {playerName} = this.state;
-    this.send('register', [playerName]);
-  };
-
   handleCreateGame = e => {
     const {gameName} = this.state;
-    this.send('createGame', [gameName]);
+    const playerName = window.prompt('Please enter the player name.');
+    this.send('createGame', [gameName, playerName]);
   };
 
   handleJoinGame = gameId => {
-    this.send('joinGame', [gameId]);
+    const playerName = window.prompt('Please enter the player name.');
+    this.send('joinGame', [gameId, playerName]);
   };
 
   handleStartGame = () => {
@@ -82,8 +107,8 @@ class App extends Component {
   };
 
   render() {
-    const {playerName, gameName} = this.state;
-    const {connected, player, game, games} = this.state.risk;
+    const {gameName} = this.state;
+    const {connected, games, game, player} = this.state.risk;
 
     return (
       <Router>
@@ -94,92 +119,79 @@ class App extends Component {
             connected &&
             <div>
               {
-                player == null ?
-                  <div>
-                    <input type="text" value={playerName}
-                           placeholder="Player Name"
-                           onChange={this.handleChangePlayerName}/>
-                    <button onClick={this.handleRegister}>Register</button>
-                  </div> :
+                game && player ?
                   <div>
                     <div>
-                      Player: {player.name}
+                      Game: {game.name}
+                    </div>
+                    <div>
+                      Player: {game.players.find(p => p.id === player).name}
+                    </div>
+                    {
+                      game.playing ?
+                        <div>
+                          Players: {
+                          game.players
+                            .map((player, i) => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${i + 1})`).join(', ')
+                        }
+                        </div> :
+                        <div>
+                          Players: {game.players.map(player => `${player.name}${player.id === game.owner ? ' (owner)' : ''}`).join(', ')}
+                        </div>
+                    }
+                    <div>
+                      <div>
+                        {
+                          game.playing ? 'Playing ...' : 'Waiting ...'
+                        }
+                      </div>
+                      {
+                        player === game.owner && !game.playing &&
+                        <button onClick={this.handleStartGame}>
+                          Start
+                        </button>
+                      }
+                      <button onClick={this.handleLeaveGame}>
+                        Leave
+                      </button>
                     </div>
                     <hr/>
                     {
-                      game ?
-                        <div>
-                          <div>
-                            Game: {game.name}
-                          </div>
+                      game.playing &&
+                      game.continents.map(continent => (
+                        <div key={continent.id}>
+                          {continent.name}
                           {
-                            game.playing ?
-                              <div>
-                                Players: {
-                                game.players
-                                  .sort((p1, p2) => game.turns.indexOf(p1.id) - game.turns.indexOf(p2.id))
-                                  .map(player => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${game.turns.indexOf(player.id) + 1})`).join(', ')
-                              } //changed turns to start from 1, so for 6 players a game has players 1 to 6
-                              </div> :
-                              <div>
-                                Players: {game.players.map(player => `${player.name}`).join(', ')}
-                              </div>
-                          }
-                          <div>
-                            <div>
-                              {
-                                game.playing ? 'Playing ...' : 'Waiting ...'
-                              }
-                            </div>
-                            {
-                              player.id === game.owner && !game.playing &&
-                              <button onClick={this.handleStartGame}>
-                                Start
-                              </button>
-                            }
-                            <button onClick={this.handleLeaveGame}>
-                              Leave
-                            </button>
-                          </div>
-                          <hr/>
-                          {
-                            game.playing &&
-                            game.continents.map(continent => (
-                              <div key={continent.id}>
-                                {continent.name}
-                                {
-                                  continent.territories.map(territory => (
-                                    <div key={territory.id}>
-                                      -- {territory.name}
-                                    </div>
-                                  ))
-                                }
-                                <br/>
+                            continent.territories.map(territory => (
+                              <div key={territory.id}>
+                                -- {territory.name}
                               </div>
                             ))
                           }
-                        </div> :
-                        <div>
-                          <div>
-                            <input type="text" value={gameName}
-                                   placeholder="Game Name"
-                                   onChange={this.handleChangeGameName}/>
-                            <button onClick={this.handleCreateGame}>
-                              Create Game
-                            </button>
-                          </div>
-                          {
-                            games.map(game => (
-                              <div key={game.id}>
-                                {game.name} ({game.players.length}/6)
-                                <button
-                                  onClick={() => this.handleJoinGame(game.id)}>
-                                  Join
-                                </button>
-                              </div>
-                            ))
-                          }
+                          <br/>
                         </div>
+                      ))
+                    }
+                  </div> :
+                  <div>
+                    <div>
+                      <input type="text" value={gameName}
+                             placeholder="Game Name"
+                             onChange={this.handleChangeGameName}/>
+                      <button onClick={this.handleCreateGame}>
+                        Create Game
+                      </button>
+                    </div>
+                    {
+                      games.map(game => (
+                        <div key={game.id}>
+                          {game.name} ({game.players.length}/6)
+                          <button
+                            onClick={() => this.handleJoinGame(game.id)}>
+                            Join
+                          </button>
+                        </div>
+                      ))
                     }
                   </div>
               }

@@ -1,49 +1,44 @@
 package models
 
-import common.Utils._
-import controllers.SocketActor
-import models.interface.{Formattable, Identifiable, Receivable}
-import play.api.libs.json._
+import controllers.Client
+import models.interface.{Identifiable, Receivable}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class Game(val name: String, var owner: Player) extends Identifiable with Formattable with Receivable {
+class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: Game => Unit) extends Identifiable with Receivable {
   var playing = false
-  val players: ArrayBuffer[Player] = ArrayBuffer()
-  var turns: Option[List[Player]] = None
+  var players: List[Player] = List()
+  var owner: Player = join(ownerName, ownerClient)
   var turnIndex: Option[Int] = None
   var continents: Option[List[Continent]] = None
-  join(owner)
 
-  override def format: JsValue = jsonObject(
+  override def fields = Map(
     "id" -> id,
     "name" -> name,
-    "owner" -> onlyId(owner),
     "playing" -> playing,
     "players" -> players,
-    "turns" -> onlyIds(turns),
+    "owner" -> owner,
     "turnIndex" -> turnIndex,
     "continents" -> continents,
   )
 
-  override def receivers: ArrayBuffer[Player] = players
+  override def receivers: List[Client] = players.map(_.client)
 
-  def join(player: Player): Unit = {
-    if (player.game.isDefined) throw new Error("The player is already in a game.")
-    if (playing) throw new Error("Unable to add a player during the game.")
+  def join(playerName: String, playerClient: Client): Player = {
+    if (players.exists(_.client == playerClient)) throw new Error("The client is already in the game.")
+    if (playing) throw new Error("Unable to join while playing.")
     if (players.length >= 6) throw new Error("Too many players.")
-    //TODO: if (player.name.equals(other player's name in the game)) throw new Error("That name is taken in this game")
+    if (players.exists(_.name == playerName)) throw new Error("The player name is already in use.")
 
-    players += player
-    player.game = Some(this)
+    val player = new Player(playerName, playerClient)
+    players :+= player
+    player
   }
 
   def leave(player: Player): Unit = {
-    if (!player.game.contains(this)) throw new Error("The player is not in the game.")
+    if (!players.contains(player)) throw new Error("The player is not in the game.")
 
-    players -= player
-    player.game = None
+    players = players.filter(_ != player)
     if (players.isEmpty) {
       destroy()
       return
@@ -65,13 +60,11 @@ class Game(val name: String, var owner: Player) extends Identifiable with Format
 
     playing = true
     val assignedArmies = 20 + (6 - players.length) * 5
-    players.foreach(player => player.assignedArmies = Some(assignedArmies))
-    turns = Some(Random.shuffle(players.toList))
+    players.foreach(player => player.assignedArmies = assignedArmies)
+    players = Random.shuffle(players)
     turnIndex = Some(0)
     continents = Some(Continent.createContinents)
   }
 
-  def destroy(): Unit = {
-    SocketActor.games -= this
-  }
+  def destroy(): Unit = onDestroy(this)
 }

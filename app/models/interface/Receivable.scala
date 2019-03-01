@@ -1,16 +1,19 @@
 package models.interface
 
-import common.Utils._
-import models.Player
-import play.api.libs.json.Json.JsValueWrapper
+import controllers.Client
 
-import scala.collection.mutable.ArrayBuffer
-
+// enable an object to receive messages
 trait Receivable {
-  def receivers: ArrayBuffer[Player]
+  // define receivers
+  def receivers: List[Client]
 
-  def send(fields: (String, JsValueWrapper)*): Unit = {
-    val response = jsonObject(fields: _*)
-    receivers.foreach(_.receiver ! response)
+  // send message to all receivers defined in the object
+  def send(keyObjs: Any*): Unit = {
+    receivers.foreach(client => client.actorRef ! client(keyObjs: _*))
+  }
+
+  // send message to the filtered receivers
+  def sendTo(filter: Client => Boolean, keyObjs: Any*): Unit = {
+    receivers.filter(filter).foreach(client => client.actorRef ! client(keyObjs: _*))
   }
 }
