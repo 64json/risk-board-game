@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import server from '../../common/server';
-import {Continent} from '../';
+import {Continent, Map} from '../';
 import './stylesheet.css';
 
 class Game extends Component {
@@ -52,6 +52,8 @@ class Game extends Component {
             Leave
           </button>
         </div>
+        <hr/>
+        <Map/>
         <hr/>
         {
           game.playing &&
