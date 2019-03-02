@@ -11,6 +11,11 @@ class Territory(val name: String) extends Identifiable {
     adjacencyTerritories ++= territories
   }
 
+  def reset(): Unit = {
+    owner = None
+    armies = None
+  }
+
   override def fields = Map(
     "id" -> id,
     "name" -> name,
