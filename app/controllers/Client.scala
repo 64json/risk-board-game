@@ -123,8 +123,8 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         startGame()
       }
       case "assignArmies" => {
-        val (territoryId, army) = typedTuple[String, Int](args)
-        assignArmies(territoryId, army)
+        val (territoryId, armies) = typedTuple[String, Int](args)
+        assignArmies(territoryId, armies)
       }
     }
   }
@@ -181,7 +181,13 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     game.send(
       "game" -> List(
         "players",
-        "owner"
+        "owner",
+        "continents" -> List(
+          "territories" -> List(
+            "owner",
+            "armies"
+          )
+        )
       )
     )
   }
@@ -202,6 +208,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "territories" -> List(
             "name",
             "adjacencyTerritories",
+            "owner",
             "armies"
           )
         )
@@ -209,10 +216,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     )
   }
 
-  def assignArmies(territoryId: String, army: Int) = {
+  def assignArmies(territoryId: String, armies: Int) = {
     val game = getGame()
     val territory = getTerritory(territoryId)
-    game.assignArmy(player.get, territory, army)
+    game.assignArmies(player.get, territory, armies)
 
     game.send(
       "game" -> List(
