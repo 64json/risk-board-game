@@ -1,13 +1,9 @@
 package models
 
-import common.Utils._
-import models.interface.{Formattable, Identifiable}
-import play.api.libs.json._
+import models.interface.Identifiable
 
-import scala.collection.mutable.ListBuffer
-
-class Territory(val name: String) extends Identifiable with Formattable {
-  val adjacencyTerritories: ListBuffer[Territory] = ListBuffer()
+class Territory(val name: String) extends Identifiable {
+  var adjacencyTerritories: List[Territory] = List()
   var owner: Option[Player] = None
   var armies: Option[Int] = None
 
@@ -15,11 +11,16 @@ class Territory(val name: String) extends Identifiable with Formattable {
     adjacencyTerritories ++= territories
   }
 
-  override def format: JsValue = jsonObject(
+  def reset(): Unit = {
+    owner = None
+    armies = None
+  }
+
+  override def fields = Map(
     "id" -> id,
     "name" -> name,
-    "adjacencyTerritories" -> onlyIds(adjacencyTerritories),
-    "owner" -> onlyId(owner),
+    "adjacencyTerritories" -> adjacencyTerritories,
+    "owner" -> owner,
     "armies" -> armies,
   )
 }
