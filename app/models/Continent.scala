@@ -18,322 +18,317 @@ object Continent {
   def createContinents: List[Continent] = {
     // Refer to https://en.wikipedia.org/wiki/Risk_(game)#/media/File:Risk_game_map_fixed.png
     val NORTH_AMERICA = new Continent("Great Cities", List(
-      "San Fransokyo",
-      "Hawaii",
-      "New Orleans",
-      "The Bayeux",
-      "Notre Dame",
-      "Court of Miracles",
-      "Arendelle",
       "Elsa's Castle",
+      "Court of Miracles",
       "London",
+      "The Bayeux",
+      "San Fransokyo",
+      "Arendelle",
+      "Notre Dame",
     ).map(name => new Territory(name)))
 
     val SOUTH_AMERICA = new Continent("Lands Unknown", List(
-      "Cusco Castle",
+      "Yzma's House",
+      "Kuzco Castle",
       "Pacha's House",
-      "Yzma's Lair",
       "Neverland",
     ).map(name => new Territory(name)))
 
     val EUROPE = new Continent("The Realm of Warriors", List(
-      "Great Wall of China",
       "Imperial City",
-      "Agrabah",
+      "Great Wall of China",
+      "Mount Olympus",
       "The Cave of Wonders",
       "Athens",
-      "Mount Olympus",
+      "Agrabah",
       "The Underworld",
     ).map(name => new Territory(name)))
 
     val AFRICA = new Continent("Land of the Fittest", List(
-      "The Pridelands",
       "The Elephant Graveyard",
-      "Timon and Pumba's Hideout",
-      "Gaston's Tavern",
       "Beast's Castle",
+      "Timon and Pumba's Hideout",
       "Belle's Cottage",
+      "The Pridelands",
+      "Gaston's Tavern",
     ).map(name => new Territory(name)))
 
     val ASIA = new Continent("The Realm of Princesses", List(
-      "Evil Queen's Castle",
-      "Dwarves' Cottage",
-      "Maleficent's Castle",
-      "Fairies' Cottage",
-      "Charming Palace",
       "Cinderella's House",
-      "Rapunzel's Tower",
-      "Corona",
-      "Atlantis",
-      "Atlantica",
+      "Fairies' Cottage",
+      "Maleficent's Castle",
+      "Evil Queen's Castle",
       "Ariel's Grotto",
       "Eric's Castle",
+      "Charming Palace",
+      "Atlantica",
+      "Atlantis",
+      "Rapunzel's Tower",
+      "Corona",
+      "Dwarves' Cottage",
     ).map(name => new Territory(name)))
 
     val AUSTRALIA = new Continent("Wayfinders' Islands", List(
+      "Realm of Monsters",
       "Motonui",
       "Te Fiti",
       "Maui's Island",
-      "Realm of Monsters",
     ).map(name => new Territory(name)))
 
-    //TODO: comment after every single border what EACH TERRITORY is actually named
-    //indexed from 1...for some reason.
-
-    NORTH_AMERICA(1).border( //San Fransokyo Borders:
-      NORTH_AMERICA(6),      //Court of Miracles
-      NORTH_AMERICA(2),     //Hawaii
-      ASIA(6),               //Cinderella's House
+    NORTH_AMERICA(1).border( //Elsa's Castle Borders:
+      NORTH_AMERICA(6),      //Arendelle
+      NORTH_AMERICA(2),     //Court of Miracles
+      ASIA(6),               //Eric's Castle
     )
-    NORTH_AMERICA(2).border( //Hawaii's Borders:
-      NORTH_AMERICA(6),      //Court of Miracles
-      NORTH_AMERICA(7),     //Arendelle
-      NORTH_AMERICA(9),     //London
-      NORTH_AMERICA(1),     //San Fransokyo
+    NORTH_AMERICA(2).border( //Court of Miracles' Borders:
+      NORTH_AMERICA(6),      //Arendelle
+      NORTH_AMERICA(7),     //Notre Dame
+      NORTH_AMERICA(9),     //New Orleans
+      NORTH_AMERICA(1),     //Elsa's Castle
     )
-    NORTH_AMERICA(3).border( //New Orleans' Borders:
-      NORTH_AMERICA(9),     //London
+    NORTH_AMERICA(3).border( //London' Borders:
+      NORTH_AMERICA(9),     //New Orleans
       NORTH_AMERICA(4),     //The Bayeux
       SOUTH_AMERICA(4),     //Neverland
     )
     NORTH_AMERICA(4).border( //The Bayeux's Borders:
-      NORTH_AMERICA(7),      //Arendelle
-      NORTH_AMERICA(8),      //Elsa's Castle
-      NORTH_AMERICA(3),      //New Orleans
-      NORTH_AMERICA(9),      //London
+      NORTH_AMERICA(7),      //Notre Dame
+      NORTH_AMERICA(8),      //Hawaii
+      NORTH_AMERICA(3),      //London
+      NORTH_AMERICA(9),      //New Orleans
     )
-    NORTH_AMERICA(5).border( //Notre Dame's Borders:
-      EUROPE(2),            //Imperial City
-      NORTH_AMERICA(8),     //Elsa's Castle
-      NORTH_AMERICA(7),     //Arendelle
-      NORTH_AMERICA(6),     //Court of Miracles
+    NORTH_AMERICA(5).border( //San Fransokyo's Borders:
+      EUROPE(2),            //Great Wall of China
+      NORTH_AMERICA(8),     //Hawaii
+      NORTH_AMERICA(7),     //Notre Dame
+      NORTH_AMERICA(6),     //Arendelle
     )
-    NORTH_AMERICA(6).border( //Court of Miracles' Borders:
-      NORTH_AMERICA(5),     //Notre Dame
-      NORTH_AMERICA(7),     //Arendelle
-      NORTH_AMERICA(2),     //Hawaii
-      NORTH_AMERICA(1),     //San Fransokyo
+    NORTH_AMERICA(6).border( //Arendelle's Borders:
+      NORTH_AMERICA(5),     //San Fransokyo
+      NORTH_AMERICA(7),     //Notre Dame
+      NORTH_AMERICA(2),     //Court of Miracles
+      NORTH_AMERICA(1),     //Elsa's Castle
     )
-    NORTH_AMERICA(7).border( //Arendelle's Borders
-      NORTH_AMERICA(6),     //Court of Miracles
-      NORTH_AMERICA(5),     //Notre Dame
-      NORTH_AMERICA(8),     //Elsa's Castle
+    NORTH_AMERICA(7).border( //Notre Dame's Borders
+      NORTH_AMERICA(6),     //Arendelle
+      NORTH_AMERICA(5),     //San Fransokyo
+      NORTH_AMERICA(8),     //Hawaii
       NORTH_AMERICA(4),     //The Bayeux
-      NORTH_AMERICA(9),     //London
-      NORTH_AMERICA(2),     //Hawaii
+      NORTH_AMERICA(9),     //New Orleans
+      NORTH_AMERICA(2),     //Court of Miracles
     )
-    NORTH_AMERICA(8).border( //Elsa's Castle's Borders:
-      NORTH_AMERICA(5),     //Notre Dame
+    NORTH_AMERICA(8).border( //Hawaii's Borders:
+      NORTH_AMERICA(5),     //San Fransokyo
       NORTH_AMERICA(4),     //The Bayeux
-      NORTH_AMERICA(7),     //Arendelle
+      NORTH_AMERICA(7),     //Notre Dame
     )
-    NORTH_AMERICA(9).border( //London's Borders:
-      NORTH_AMERICA(2),     //Hawaii
-      NORTH_AMERICA(7),     //Arendelle
+    NORTH_AMERICA(9).border( //New Orleans' Borders:
+      NORTH_AMERICA(2),     //Court of Miracles
+      NORTH_AMERICA(7),     //Notre Dame
       NORTH_AMERICA(4),     //The Bayeux
-      NORTH_AMERICA(3),     //New Orleans
+      NORTH_AMERICA(3),     //London
     )
 
-    SOUTH_AMERICA(1).border( //Kuzco Castle Borders:
-      SOUTH_AMERICA(3),      //Yzma's Lair
-      SOUTH_AMERICA(2),      //Pacha's House
+    SOUTH_AMERICA(1).border( //Yzma's Lair's Borders:
+      SOUTH_AMERICA(3),      //Pacha's House
+      SOUTH_AMERICA(2),      //Kuzco's Castle
     )
-    SOUTH_AMERICA(2).border( //Pacha's House's Borders:
+    SOUTH_AMERICA(2).border( //Kuzco's Castle's Borders:
       SOUTH_AMERICA(4),     //Neverland
-      AFRICA(5),            //Beast's Castle
-      SOUTH_AMERICA(1),     //Kuzco's Castle
-      SOUTH_AMERICA(3),     //Yzma's Lair
+      AFRICA(5),            //The Pridelands
+      SOUTH_AMERICA(1),     //Yzma's Lair
+      SOUTH_AMERICA(3),     //Pacha's House
     )
-    SOUTH_AMERICA(3).border( //Yzma's Lair's Borders:
+    SOUTH_AMERICA(3).border( //Pacha's House's Borders:
       SOUTH_AMERICA(4),     //Nerverland
-      SOUTH_AMERICA(2),     //Pacha's House
-      SOUTH_AMERICA(1),     //Kuzco's Castle
+      SOUTH_AMERICA(2),     //Kuzco's Caslte
+      SOUTH_AMERICA(1),     //Yzma's Lair
     )
     SOUTH_AMERICA(4).border( //Neverland's Borders
-      NORTH_AMERICA(3),     //New Orleans
-      SOUTH_AMERICA(2),     //Pacha's House
-      SOUTH_AMERICA(3),     //Yzma's Lair
+      NORTH_AMERICA(3),     //London
+      SOUTH_AMERICA(2),     //Kuzco's Castle
+      SOUTH_AMERICA(3),     //Pacha's House
     )
 
-    EUROPE(1).border(      //Great Wall of China's Borders:
-      EUROPE(2),          //Imperial City
+    EUROPE(1).border(      //Imperial City's Borders:
+      EUROPE(2),          //Great Wall of China
       EUROPE(4),          //The Cave of Wonders
-      EUROPE(3),          //Agrabah
+      EUROPE(3),          //Mount Olympus
       EUROPE(7),          //The Underworld
     )
-    EUROPE(2).border(     //Imperial City's Borders:
-      NORTH_AMERICA(5),   //Notre Dame
+    EUROPE(2).border(     //Great Wall of China's Borders:
+      NORTH_AMERICA(5),   //San Fransokyo
       EUROPE(4),          //The Cave of Wonders
-      EUROPE(1),          //Great Wall of China
+      EUROPE(1),          //Imperial City
     )
-    EUROPE(3).border(     //Agrabah's Borders:
+    EUROPE(3).border(     //Mount Olympus' Borders:
       EUROPE(4),          //The Cave of Wonders
-      EUROPE(6),          //Mount Olympus
+      EUROPE(6),          //Agrabah
       EUROPE(5),          //Athens
       EUROPE(7),          //The Underworld
-      EUROPE(1),          //Great Wall of China
+      EUROPE(1),          //Imperial City
     )
     EUROPE(4).border(     //The Cave of Wonders' Borders:
-      EUROPE(6),          //Mount Olympus
-      EUROPE(3),          //Agrabah
-      EUROPE(1),          //Great Wall of China
-      EUROPE(2),          //Imperial City
+      EUROPE(6),          //Agrabah
+      EUROPE(3),          //Mount Olympus
+      EUROPE(1),          //Imperial City
+      EUROPE(2),          //Great Wall of China
     )
     EUROPE(5).border(     //Athens' Borders:
-      EUROPE(3),          //Agrabah
-      EUROPE(6),          //Mount Olympus
-      ASIA(7),            //Rapunzel's Tower
+      EUROPE(3),          //Mount Olympus
+      EUROPE(6),          //Agrabah
+      ASIA(7),            //Charming Palace
       AFRICA(3),          //Timon and Pumba's Hideout
-      AFRICA(5),          //Beast's Castle
+      AFRICA(5),          //The Pridelands
       EUROPE(7),          //The Underworld
     )
-    EUROPE(6).border(     //Mount Olympus' Borders:
+    EUROPE(6).border(     //Agrabah's Borders:
       EUROPE(4),          //The Cave of Wonders
-      ASIA(11),           //Ariel's Grotto
-      ASIA(1),            //Evil Queen's Castle
-      ASIA(7),            //Rapunzel's Tower
+      ASIA(11),           //Corona
+      ASIA(1),            //Cinderella's House
+      ASIA(7),            //Charming Palace
       EUROPE(5),          //Athens
-      EUROPE(3),          //Agrabah
+      EUROPE(3),          //Mount Olympus
     )
     EUROPE(7).border(     //The Underworld's Borders:
-      EUROPE(1),          //Great Wall of China
-      EUROPE(3),          //Agrabah
+      EUROPE(1),          //Imperial City
+      EUROPE(3),          //Mount Olympus
       EUROPE(5),          //Athens
-      AFRICA(5),          //Beast's Castle
+      AFRICA(5),          //The Pridelands
     )
 
-    AFRICA(1).border(     //The Pridelands' Borders:
-      AFRICA(5),          //Beast's Castle
-      AFRICA(2),          //The Elephant Graveyard
-      AFRICA(6),          //Belle's Cottage
+    AFRICA(1).border(     //The Elephant Graveyard's Borders:
+      AFRICA(5),          //The Pridelands
+      AFRICA(2),          //Beast's Castle
+      AFRICA(6),          //Gaston's Tavern
     )
-    AFRICA(2).border(     //The Elephant Graveyard's Borders:
+    AFRICA(2).border(     //Beast's Castle Borders:
       AFRICA(3),          //Timon and Pumba's Hideout
-      ASIA(7),            //Rapunzel's Tower
-      AFRICA(4),          //Gaston's Tavern
-      AFRICA(6),          //Belle's Cottage
-      AFRICA(1),          //The Pridelands
-      AFRICA(5),          //Beast's Castle
+      ASIA(7),            //Charming Palace
+      AFRICA(4),          //Belle's Cottage
+      AFRICA(6),          //Gaston's Tavern
+      AFRICA(1),          //The Elephant Graveyard
+      AFRICA(5),          //The Pridelands
     )
     AFRICA(3).border(     //Timon and Pumba's Hideout Borders:
       EUROPE(5),          //Athens
-      ASIA(7),            //Rapunzel's Tower
-      AFRICA(2),          //The Elephant Graveyard
-      AFRICA(5),          //Beast's Castle
+      ASIA(7),            //Charming Palace
+      AFRICA(2),          //Beast's Castle
+      AFRICA(5),          //The Pridelands
     )
-    AFRICA(4).border(     //Gaston's Tavern Borders:
-      AFRICA(2),          //The Elephant Graveyard
-      AFRICA(6),          //Belle's Cottage
+    AFRICA(4).border(     //Belle's Cottage Borders:
+      AFRICA(2),          //Beast's Castle
+      AFRICA(6),          //Gaston's Tavern
     )
-    AFRICA(5).border(     //Beast's Castle Borders:
+    AFRICA(5).border(     //The Pridelands Borders:
       EUROPE(7),          //The Underworld
       EUROPE(5),          //Athens
       AFRICA(3),          //Timon and Pumba's Hideout
-      AFRICA(2),          //The Elephant Graveyard
-      AFRICA(1),          //The Pridelands
-      SOUTH_AMERICA(2),   //Pacha's House
+      AFRICA(2),          //Beast's Castle
+      AFRICA(1),          //The Elephant Graveyard
+      SOUTH_AMERICA(2),   //Kuzco Castle
     )
-    AFRICA(6).border(     //Belle's Cottage Borders:
-      AFRICA(1),          //The Pridelands
-      AFRICA(2),          //The Elephant Graveyard
-      AFRICA(4),          //Gaston's Tavern
-    )
-
-    ASIA(1).border( //Evil Queen's Castle's Borders:
-      EUROPE(6),
-      ASIA(11),
-      ASIA(2),
-      ASIA(3),
-      ASIA(7),
-    )
-    ASIA(2).border(
-      ASIA(8),
-      ASIA(9),
-      ASIA(3),
-      ASIA(1),
-      ASIA(11),
-      ASIA(10),
-    )
-    ASIA(3).border(
-      ASIA(1),
-      ASIA(2),
-      ASIA(9),
-      ASIA(7),
-    )
-    ASIA(4).border(
-      ASIA(12),
-      ASIA(6),
-      ASIA(8),
-      ASIA(10),
-    )
-    ASIA(5).border(
-      ASIA(6),
-      ASIA(8),
-    )
-    ASIA(6).border(
-      ASIA(12),
-      NORTH_AMERICA(1),
-      ASIA(5),
-      ASIA(8),
-      ASIA(4),
-    )
-    ASIA(7).border(
-      EUROPE(6),
-      ASIA(1),
-      ASIA(3),
-      AFRICA(2),
-      AFRICA(3),
-      EUROPE(5),
-    )
-    ASIA(8).border(
-      ASIA(4),
-      ASIA(6),
-      ASIA(5),
-      ASIA(2),
-      ASIA(10),
-    )
-    ASIA(9).border(
-      ASIA(2),
-      AUSTRALIA(2),
-      ASIA(3),
-    )
-    ASIA(10).border(
-      ASIA(12),
-      ASIA(4),
-      ASIA(8),
-      ASIA(2),
-      ASIA(11),
-    )
-    ASIA(11).border(
-      ASIA(10),
-      ASIA(2),
-      ASIA(1),
-      EUROPE(6),
-    )
-    ASIA(12).border(
-      ASIA(6),
-      ASIA(4),
-      ASIA(10),
+    AFRICA(6).border(     //Gaston's Tavern Borders:
+      AFRICA(1),          //The Elephant Graveyard
+      AFRICA(2),          //The Pridelands
+      AFRICA(4),          //Belle's Cottage
     )
 
-    AUSTRALIA(1).border(
-      AUSTRALIA(3),
-      AUSTRALIA(4),
+    ASIA(1).border(       //Cinderella's House's Borders:
+      EUROPE(6),          //Agrabah
+      ASIA(11),           //Corona
+      ASIA(2),            //Fairies' Cottage
+      ASIA(3),            //Maleficent's Castle
+      ASIA(7),            //Charming Palace
     )
-    AUSTRALIA(2).border(
-      ASIA(9),
-      AUSTRALIA(3),
-      AUSTRALIA(4),
+    ASIA(2).border(       //Fairies' Cottage's Borders:
+      ASIA(8),            //Atlantica
+      ASIA(9),            //Atlantis
+      ASIA(3),            //Maleficent's Castle
+      ASIA(1),            //Cinderella's House
+      ASIA(11),           //Corona
+      ASIA(10),           //Rapunzel's Tower
     )
-    AUSTRALIA(3).border(
-      AUSTRALIA(1),
-      AUSTRALIA(4),
-      AUSTRALIA(2),
+    ASIA(3).border(       //Maleficent's Castle's Borders:
+      ASIA(1),            //Cinderella's House
+      ASIA(2),            //Fairies' Cottage
+      ASIA(9),            //Atlantis
+      ASIA(7),            //Charming Palace
     )
-    AUSTRALIA(4).border(
-      AUSTRALIA(2),
-      AUSTRALIA(3),
-      AUSTRALIA(1),
+    ASIA(4).border(       //Evil Queen's Castle's Borders:
+      ASIA(12),           //Dwarves' Cottage
+      ASIA(6),            //Eric's Castle
+      ASIA(8),            //Atlantica
+      ASIA(10),           //Rapunzel's Tower
+    )
+    ASIA(5).border(       //Ariel's Grotto's Borders:
+      ASIA(6),            //Eric's Castle
+      ASIA(8),            //Atlantica
+    )
+    ASIA(6).border(       //Eric's Castle's Borders:
+      ASIA(12),           //Dwarves' Cottage
+      NORTH_AMERICA(1),   //Elsa's Castle
+      ASIA(5),            //Ariel's Grotto
+      ASIA(8),            //Atlantica
+      ASIA(4),            //Evil Queen's Castle
+    )
+    ASIA(7).border(       //Charming Palace's Borders:
+      EUROPE(6),          //Agrabah
+      ASIA(1),            //Cinderella's House
+      ASIA(3),            //Maleficent's Castle
+      AFRICA(2),          //Beast's Castle
+      AFRICA(3),          //Timon and Pumba's Hideout
+      EUROPE(5),          //Ariel's Grotto
+    )
+    ASIA(8).border(       //Atlantica's Borders:
+      ASIA(4),            //Evil Queen's Castle
+      ASIA(6),            //Eric's Castle
+      ASIA(5),            //Ariel's Grotto
+      ASIA(2),            //Fairies' Cottage
+      ASIA(10),           //Rapunzel's Tower
+    )
+    ASIA(9).border(       //Atlantis' Borders:
+      ASIA(2),            //Fairies' Cottage
+      AUSTRALIA(2),       //Motonui
+      ASIA(3),            //Maleficent's Castle
+    )
+    ASIA(10).border(      //Rapunzel's Tower's Borders:
+      ASIA(12),           //Dwarves' Cottage
+      ASIA(4),            //Evil Queen's Castle
+      ASIA(8),            //Atlantica
+      ASIA(2),            //Fairies' Cottage
+      ASIA(11),           //Corona
+    )
+    ASIA(11).border(      //Corona's Borders:
+      ASIA(10),           //Rapunzel's Tower
+      ASIA(2),            //Fairies' Cottage
+      ASIA(1),            //Cinderella's house
+      EUROPE(6),          //Agrabah
+    )
+    ASIA(12).border(      //Dwarves' Cottage's Borders:
+      ASIA(6),            //Eric's Castle
+      ASIA(4),            //Evil Queen's Castle
+      ASIA(10),           //Rapunzel's Tower
+    )
+
+    AUSTRALIA(1).border( //Realm of Monsters' Borders:
+      AUSTRALIA(3),     //Te Fiti
+      AUSTRALIA(4),     //Maui's Island
+    )
+    AUSTRALIA(2).border( //Motonui's Borders:
+      ASIA(9),          //Atlantis
+      AUSTRALIA(3),     //Te Fiti
+      AUSTRALIA(4),     //Maui's Island
+    )
+    AUSTRALIA(3).border( //Te Fiti's Borders:
+      AUSTRALIA(1),     //Realm of Monsters
+      AUSTRALIA(4),     //Maui's Island
+      AUSTRALIA(2),     //Motonui
+    )
+    AUSTRALIA(4).border( //Maui's Island's Borders:
+      AUSTRALIA(2),      //Motonui
+      AUSTRALIA(3),     // Te Fiti
+      AUSTRALIA(1),     //Realm of Monsters
     )
 
     List(
