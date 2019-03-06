@@ -25,6 +25,8 @@ object Continent {
       "San Fransokyo",
       "Arendelle",
       "Notre Dame",
+      "Hawaii",
+      "New Orleans",
     ).map(name => new Territory(name)))
 
     val SOUTH_AMERICA = new Continent("Lands Unknown", List(
