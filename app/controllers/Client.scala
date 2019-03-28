@@ -126,6 +126,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         val (territoryId, armies) = typedTuple[String, Int](args)
         assignArmies(territoryId, armies)
       }
+      case "proceedWithTurn" => {
+        val playerId = typed[String](args)
+        proceedWithTurn(playerId)
+      }
     }
   }
 
@@ -203,6 +207,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "players" -> List(
           "assignedArmies"
         ),
+        "turnIndex",
         "continents" -> List(
           "name",
           "territories" -> List(
@@ -232,6 +237,20 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
             "armies"
           )
         )
+      )
+    )
+  }
+
+  def proceedWithTurn(playerId: String) = {
+    val game = getGame()
+    val player = game.players(game.turnIndex.get)
+    if(player.id != playerId) throw new Error("diff plaewraewgw")
+    game.turnIndex = Some(game.turnIndex.get + 1)
+    game.turnIndex = Some(game.turnIndex.get % game.players.length)
+
+    game.send(
+      "game" -> List(
+        "turnIndex"
       )
     )
   }
