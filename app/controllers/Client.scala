@@ -124,6 +124,8 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       }
       case "assignArmies" => {
         val (territoryId, armies) = typedTuple[String, Int](args)
+
+
         assignArmies(territoryId, armies)
       }
     }
@@ -200,6 +202,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     game.send(
       "game" -> List(
         "playing",
+        "turnIndex",
         "players" -> List(
           "assignedArmies"
         ),

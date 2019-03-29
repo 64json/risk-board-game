@@ -16,8 +16,17 @@ class Game extends Component {
   render() {
     const {game, player} = server;
 
+    const turn = game.players.map((player, i) => ({id: player.id, name:player.name, turn: i + 1}))
+    const currentTurn = turn.filter(x => x.id === player)[0].turn
+
     return (
       <div>
+        <div>
+          {
+            ////turn is notified from here
+            game.playing? <div><h1>Your turn is {currentTurn}</h1></div> : ''
+          }
+        </div>
         <div>
           Game: {game.name}
         </div>
