@@ -13,8 +13,20 @@ class Game extends Component {
     server.leaveGame();
   };
 
+  handleProceedWithTurn = () => {
+    const {player} = server;
+    server.proceedWithTurn(player);
+  }
+
   render() {
     const {game, player} = server;
+    console.log(server);
+
+    let canProceed;
+    if(game.playing) {
+      const playerObject = game.players[game.turnIndex];
+      canProceed = playerObject.id === player && playerObject.assignedArmies === 0;
+    }
 
     const turn = game.players.map((player, i) => ({id: player.id, name:player.name, turn: i + 1}))
     const currentTurn = turn.filter(x => x.id === player)[0].turn
@@ -39,6 +51,12 @@ class Game extends Component {
               Players: {
               game.players
                 .map((player, i) => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${i + 1})`).join(', ')
+            }
+            {
+              //Greyed out or not present unless it is your turn and you have assigned all of your armies
+              <button onClick={this.handleProceedWithTurn} disabled={!canProceed}>
+                Proceed With Turn
+              </button>
             }
             </div> :
             <div>

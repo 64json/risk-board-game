@@ -88,6 +88,10 @@ class Server {
   assignArmies(territoryId, armies) {
     this.send('assignArmies', [territoryId, armies]);
   }
+
+  proceedWithTurn(playerId) {
+    this.send('proceedWithTurn', [playerId]);
+  }
 }
 
 const server = new Server();
