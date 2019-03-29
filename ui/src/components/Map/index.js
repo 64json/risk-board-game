@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import {SvgLoader, SvgProxy} from 'react-svgmt';
-import svgUrl from './map.svg';
+import svgUrl from './DisneyRiskMapPlain.svg';
 import './stylesheet.css';
 
 class Map extends Component {
