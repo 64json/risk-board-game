@@ -79,12 +79,26 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   def assignArmies(player: Player, territory: Territory, armies: Int): Unit = {
     if (armies < 1) throw new Error("You need to assign at least one dude.")
     if (armies > player.assignedArmies) throw new Error("You do not have enough army dudes available.")
-    if (territory.owner.isDefined && territory.owner.get != player) throw new Error(s"This is not ${player.name}'s territory.")
+    if (territory.owner.isDefined && territory.owner.get != player) {
+      territory.owner = Some(player)
+      territory.armies = Some(territory.armies.getOrElse(0) + armies)
+      player.assignedArmies -= armies
+    }
 
-    territory.owner = Some(player)
+    else {
+      (addToOwned(player: Player, territory: Territory, armies: Int))
+    }
+  }
+
+
+    def addToOwned(player: Player, territory: Territory, armies: Int): Unit  = {
+    if (armies < 1) throw new Error("You need to assign at least one dude.")
+    if (armies > player.assignedArmies) throw new Error("You do not have enough army dudes available.")
     territory.armies = Some(territory.armies.getOrElse(0) + armies)
     player.assignedArmies -= armies
+
   }
+
 
   def destroy(): Unit = onDestroy(this)
 }
