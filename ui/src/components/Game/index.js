@@ -14,31 +14,21 @@ class Game extends Component {
   };
 
   handleProceedWithTurn = () => {
-    const {player} = server;
-    server.proceedWithTurn(player);
-  }
+    server.proceedWithTurn();
+  };
 
   render() {
     const {game, player} = server;
     console.log(server);
 
-    let canProceed;
-    if(game.playing) {
-      const playerObject = game.players[game.turnIndex];
-      canProceed = playerObject.id === player && playerObject.assignedArmies === 0;
-    }
-
-    const turn = game.players.map((player, i) => ({id: player.id, name:player.name, turn: i + 1}))
-    const currentTurn = turn.filter(x => x.id === player)[0].turn
+    let playerOnMove = game.playing && game.players[game.turnIndex];
 
     return (
       <div>
-        <div>
-          {
-            ////turn is notified from here
-            game.playing? <div><h1>Your turn is {currentTurn}</h1></div> : ''
-          }
-        </div>
+        {
+          game.playing &&
+          <h1>{playerOnMove.id === player ? 'Your turn.' : `${playerOnMove.name}'s turn.`}</h1>
+        }
         <div>
           Game: {game.name}
         </div>
@@ -51,12 +41,6 @@ class Game extends Component {
               Players: {
               game.players
                 .map((player, i) => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${i + 1})`).join(', ')
-            }
-            {
-              //Greyed out or not present unless it is your turn and you have assigned all of your armies
-              <button onClick={this.handleProceedWithTurn} disabled={!canProceed}>
-                Proceed With Turn
-              </button>
             }
             </div> :
             <div>
@@ -75,12 +59,17 @@ class Game extends Component {
               Start
             </button>
           }
+          {
+            game.playing &&
+            <button onClick={this.handleProceedWithTurn}
+                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+              Proceed With Turn
+            </button>
+          }
           <button onClick={this.handleLeaveGame}>
             Leave
           </button>
         </div>
-        <hr/>
-        <Map/>
         <hr/>
         {
           game.playing &&
@@ -88,6 +77,8 @@ class Game extends Component {
             <Continent key={continent.id} continent={continent}/>
           ))
         }
+        <hr/>
+        <Map/>
       </div>
     );
   }

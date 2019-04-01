@@ -89,8 +89,8 @@ class Server {
     this.send('assignArmies', [territoryId, armies]);
   }
 
-  proceedWithTurn(playerId) {
-    this.send('proceedWithTurn', [playerId]);
+  proceedWithTurn() {
+    this.send('proceedWithTurn', []);
   }
 }
 

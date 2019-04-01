@@ -124,13 +124,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       }
       case "assignArmies" => {
         val (territoryId, armies) = typedTuple[String, Int](args)
-
-
         assignArmies(territoryId, armies)
       }
       case "proceedWithTurn" => {
-        val playerId = typed[String](args)
-        proceedWithTurn(playerId)
+        proceedWithTurn()
       }
     }
   }
@@ -224,7 +221,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     )
   }
 
-  def assignArmies(territoryId: String, armies: Int) = {
+  def assignArmies(territoryId: String, armies: Int): Unit = {
     val game = getGame()
     val territory = getTerritory(territoryId)
     game.assignArmies(player.get, territory, armies)
@@ -244,12 +241,11 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     )
   }
 
-  def proceedWithTurn(playerId: String) = {
+  def proceedWithTurn(): Unit = {
     val game = getGame()
     val player = game.players(game.turnIndex.get)
-    if(player.id != playerId) throw new Error("diff plaewraewgw")
-    game.turnIndex = Some(game.turnIndex.get + 1)
-    game.turnIndex = Some(game.turnIndex.get % game.players.length)
+    if (player.client != this) throw new Error(s"This is not ${player.name}'s turn.")
+    game.proceedWithTurn()
 
     game.send(
       "game" -> List(
