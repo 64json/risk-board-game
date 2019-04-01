@@ -66,7 +66,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     val assignedArmies = 20 + (6 - players.length) * 5
     players.foreach(player => player.assignedArmies = assignedArmies)
     players = Random.shuffle(players)
-    turnIndex = Some(0)
+    turnIndex = None
     continents = Some(Continent.createContinents)
   }
 
@@ -83,12 +83,29 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     territory.owner = Some(player)
     territory.armies = Some(territory.armies.getOrElse(0) + armies)
     player.assignedArmies -= armies
+    if (turnIndex.isEmpty && players.forall(_.assignedArmies == 0)) {
+      turnIndex = Some(0)
+      giveArmies()
+    }
   }
 
   def proceedWithTurn(): Unit = {
-    val player = players(turnIndex.get)
-    if (player.assignedArmies > 0) throw new Error(s"All the armies should be assigned before proceeding with turn.")
+    if (players(turnIndex.get).assignedArmies > 0) throw new Error(s"All the armies should be assigned before proceeding with turn.")
     turnIndex = Some((turnIndex.get + 1) % players.length)
+    giveArmies()
+  }
+
+  def giveArmies(): Unit = {
+    val player = players(turnIndex.get)
+    var totalTerritoryCount = 0
+    continents.get.foreach(continent => {
+      val continentTerritoryCount = continent.territories.count(_.owner.contains(player))
+      if (continentTerritoryCount == continent.territories.length) {
+        player.assignedArmies = player.assignedArmies + continent.additionalArmies
+      }
+      totalTerritoryCount = totalTerritoryCount + continentTerritoryCount
+    })
+    player.assignedArmies = player.assignedArmies + Math.max(3, totalTerritoryCount / 3)
   }
 
   def destroy(): Unit = onDestroy(this)
