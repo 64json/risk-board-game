@@ -1,7 +1,10 @@
 package models
 
+import java.util
+
 import controllers.Client
 import models.interface.{Identifiable, Receivable}
+import play.api.libs.json.{JsArray, JsValue, Json}
 
 import scala.util.Random
 
@@ -107,6 +110,32 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     })
     player.assignedArmies = player.assignedArmies + Math.max(3, totalTerritoryCount / 3)
   }
+
+  def Attack(player: Player, diceToRoll: Int, territoryA: Territory, territoryB: Territory): Unit = {
+    if (territoryA.owner.get != player) throw new Error(s"You do not own the Territory: " + territoryA.name)
+    else if (territoryA.armies.get < diceToRoll) throw new Error(s"You need at least 3 armies to attack a territory.")
+    else if (territoryB.owner.get == player) throw new Error(s"You cannot attack your own territory")
+    else if (territoryB.owner.get == null) throw new Error(s"You cannot attack an unoccupied territory")
+    else if (!territoryA.adjacencyTerritories.contains(territoryB)) throw new Error(s"This is not an adjacent territory.")
+    val dice: Random = new Random(6)
+    var resultAttacker = 0
+    var resultDefender = 0
+    var AttackerWins = 0
+    var DefenderWins = 0
+    var timesRolled: Int = 0
+    while (timesRolled < diceToRoll) {
+      resultAttacker = dice.nextInt()
+      resultDefender = dice.nextInt()
+      if (resultAttacker <= resultDefender) DefenderWins += 1
+      else AttackerWins += 1
+
+      timesRolled += 1
+
+    }
+    territoryA.armies = Some(territoryA.armies.getOrElse(0) - DefenderWins)
+    territoryB.armies = Some(territoryB.armies.getOrElse(0) - AttackerWins)
+  }
+
 
   def destroy(): Unit = onDestroy(this)
 }

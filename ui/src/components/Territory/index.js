@@ -31,6 +31,7 @@ class Territory extends Component {
     const {game} = server;
     console.log(server);
 
+
     return (
       <div>
         <input type="number" placeholder="# of Armies" value={armies}
@@ -38,6 +39,8 @@ class Territory extends Component {
         <button onClick={this.handleAssignArmies}>
           Assign
         </button>
+
+
         {territory.name} ({territory.owner ? `${game.players.find(player => player.id === territory.owner).name}: ${territory.armies} Armies` : `Not Claimed`})
       </div>
     );

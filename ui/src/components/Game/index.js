@@ -14,6 +14,18 @@ class Game extends Component {
   };
 
   handleProceedWithTurn = () => {
+    const {game} = server;
+    if(window.confirm("Would you like to attack this turn?")) {
+      let playerA = game.playing && game.turnIndex != null && game.players[game.turnIndex];
+      let playerB = game.playing && game.turnIndex != null && game.players[game.turnIndex++];
+
+
+      var armyA = playerA.window.prompt("Please enter the amount of dice you would like to use (1-3): ", "0");
+      var armyB = playerB.window.prompt("Please enter the amount of dice you would like to use (1-3): ", "0");
+      var armyNumA = parseInt(armyA, 10);
+      var armyNumB = parseInt(armyB, 10);
+      server.compareDice(armyNumA, armyNumB);
+    }
     server.proceedWithTurn();
   };
 
