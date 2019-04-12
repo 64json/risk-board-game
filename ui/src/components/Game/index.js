@@ -5,15 +5,6 @@ import {Continent, Map} from '../';
 import './stylesheet.css';
 
 class Game extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      attackingTerritory: '',
-      enemyTerritory: ''
-    };
-  }
-
   handleStartGame = () => {
     server.startGame();
   };
@@ -27,15 +18,21 @@ class Game extends Component {
   };
 
   handleAttack = () => {
-    server.attack(this.attackingTerritory, this.enemyTerritory)
-  };
+    let attackingTerritory;
+    let attackingTerritoryName = prompt("Which territory do you want to attack from?", "Name of Territory")
+    if (attackingTerritoryName === null || attackingTerritoryName === "") {
+      attackingTerritory = "Player did not enter a valid territory name"
+    }
+    else attackingTerritory = attackingTerritoryName
 
-  handleAttackDeclaration = (attackingTerritory) => {
-    server.attackDeclaration(attackingTerritory)
-  };
+    let enemyTerritory;
+    let enemyTerritoryName = prompt("Which territory do you want to attack?", "Name of Enemy Territory")
+    if (enemyTerritoryName === null || enemyTerritoryName === "") {
+      enemyTerritory = "Player did not enter a valid territory name"
+    }
+    else enemyTerritory = enemyTerritoryName
 
-  handleEnemyDeclaration = (enemyTerritory) => {
-    server.enemyDeclaration(enemyTerritory)
+    server.attack(attackingTerritory, enemyTerritory);
   };
 
   render() {
@@ -83,30 +80,18 @@ class Game extends Component {
             <button onClick={this.handleStartGame}>
               Start
             </button>
-            }
-            {
+          }
+          {
             game.playing &&
             <button onClick={this.handleProceedWithTurn}
-                  disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
-            Pass Turn to Next Player
+                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+              Pass Turn to Next Player
             </button>
-            }
-          {
-            game.playing &&
-            <input type="attackingTerritory" placeholder={"Your Attacking Territory"}
-                   value={this.attackingTerritory}
-                   onChange={this.handleAttackDeclaration(this.attackingTerritory)}/>
           }
           {
             game.playing &&
-            <input type="opponentTerritory" placeholder={"Enemy's Defending Territory"}
-                   value={this.enemyTerritory}
-                   onChange={this.handleEnemyDeclaration(this.enemyTerritory)}/>
-          }
-          {
-            game.playing &&
-            <button onClick={this.handleAttack()}
-            disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+            <button onClick={this.handleAttack}
+                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
               Attack
             </button>
           }

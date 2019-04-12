@@ -269,38 +269,4 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       )
     )
   }
-
-  def attackDeclaration(attackingTerritoryId: String): Unit = {
-    val game = getGame()
-    val territory = getTerritory(attackingTerritoryId)
-
-    game.attackDeclaration(territory)
-
-    game.send(
-      "game" -> List(
-        "continents" -> List(
-          "territories"
-        ),
-        "owner"
-      )
-    )
-
-  }
-
-  def enemyDeclaration(enemyTerritoryId: String): Unit = {
-    val game = getGame()
-    val territory = getTerritory(enemyTerritoryId)
-
-    game.enemyDeclaration(territory)
-  }
-
-  def attack(attackingTerritoryId: String, opponentTerritoryId: String): Unit = {
-    val game = getGame()
-    val player = game.players(game.turnIndex.get)
-
-    val attackingTerritory = getTerritory(attackingTerritoryId)
-    val opponentTerritory = getTerritory(opponentTerritoryId)
-    game.attack(attackingTerritory, opponentTerritory)
-
-  }
 }

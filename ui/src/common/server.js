@@ -93,16 +93,8 @@ class Server {
     this.send('proceedWithTurn', []);
   }
 
-  enemyDeclaration(enemyTerritoryId) {
-    this.send('enemyDeclaration', [enemyTerritoryId])
-  }
-
-  attackDeclaration(attackingTerritoryId) {
-    this.send('attackDeclaration',[attackingTerritoryId])
-  }
-
-  attack(attackTerritoryId, opponentTerritoryId) {
-    this.send('attack', [attackTerritoryId, opponentTerritoryId]);
+  attack(attackingTerritoryId, enemyTerritoryId) {
+    this.send('attack', [attackingTerritoryId, enemyTerritoryId]);
   }
 }
 

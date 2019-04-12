@@ -108,30 +108,36 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     player.assignedArmies = player.assignedArmies + Math.max(3, totalTerritoryCount / 3)
   }
 
-  def attack(attacker: Territory, opponent: Territory): Unit = {
+  def attack(attackingTerritoryId: String, enemyTerritoryId: String): Unit = {
     val player = players(turnIndex.get)
+    val attackingTerritory = continents.get.foreach(continent => {
+      val continentTerritories = continent.territories
+      continentTerritories.foreach(territory => {
+        if (territory.name == attackingTerritoryId) {
+          if (territory.owner == Some && territory.owner != player) {
+            throw new Error("You cannot attack from a territory you don't own")
+          } else {
+            territory
+          }
+        }
+      })
+    })
 
-    if (!attacker.adjacencyTerritories.contains(opponent)) throw new Error("You can only attack adjacent territories")
-
+    val enemyTerritory = continents.get.foreach(continent => {
+      val continentTerritories = continent.territories
+      continentTerritories.foreach(territory => {
+        if (territory.name == enemyTerritoryId) {
+          if (territory.owner == Some && territory.owner == player) {
+            throw new Error("You cannot attack a territory you own")
+          } else if (!(territory.adjacencyTerritories.contains(attackingTerritory))) {
+            throw new Error("You cannot attack a non-adjacent territory")
+          } else {
+            territory
+          }
+        }
+      })
+    })
   }
-
-  def attackDeclaration(attackingTerritory: Territory): Unit = {
-    val player = players(turnIndex.get)
-
-    if (!(attackingTerritory.owner == Some && attackingTerritory.owner != player.name))
-      throw new Error("You cannot attack from a territory you do not own")
-    if (!(attackingTerritory.armies == Some && attackingTerritory.armies.get > 1))
-      throw new Error("You must have at least 2 armies in a territory to be able to attack")
-
-  }
-
-  def enemyDeclaration(enemyTerritory: Territory): Unit = {
-    val player = players(turnIndex.get)
-
-    if (enemyTerritory.owner == Some && enemyTerritory.owner == player.name)
-      throw new Error("You cannot attack a territory you own")
-  }
-
 
   def destroy(): Unit = onDestroy(this)
 }
