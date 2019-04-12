@@ -5,6 +5,15 @@ import {Continent, Map} from '../';
 import './stylesheet.css';
 
 class Game extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      attackingTerritory: '',
+      enemyTerritory: ''
+    };
+  }
+
   handleStartGame = () => {
     server.startGame();
   };
@@ -15,6 +24,18 @@ class Game extends Component {
 
   handleProceedWithTurn = () => {
     server.proceedWithTurn();
+  };
+
+  handleAttack = () => {
+    server.attack(this.attackingTerritory, this.enemyTerritory)
+  };
+
+  handleAttackDeclaration = (attackingTerritory) => {
+    server.attackDeclaration(attackingTerritory)
+  };
+
+  handleEnemyDeclaration = (enemyTerritory) => {
+    server.enemyDeclaration(enemyTerritory)
   };
 
   render() {
@@ -62,18 +83,37 @@ class Game extends Component {
             <button onClick={this.handleStartGame}>
               Start
             </button>
+            }
+            {
+            game.playing &&
+            <button onClick={this.handleProceedWithTurn}
+                  disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+            Pass Turn to Next Player
+            </button>
+            }
+          {
+            game.playing &&
+            <input type="attackingTerritory" placeholder={"Your Attacking Territory"}
+                   value={this.attackingTerritory}
+                   onChange={this.handleAttackDeclaration(this.attackingTerritory)}/>
           }
           {
             game.playing &&
-            <button onClick={this.handleProceedWithTurn}
-                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
-              Proceed With Turn
+            <input type="opponentTerritory" placeholder={"Enemy's Defending Territory"}
+                   value={this.enemyTerritory}
+                   onChange={this.handleEnemyDeclaration(this.enemyTerritory)}/>
+          }
+          {
+            game.playing &&
+            <button onClick={this.handleAttack()}
+            disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+              Attack
             </button>
           }
-          <button onClick={this.handleLeaveGame}>
-            Leave
-          </button>
         </div>
+        <button onClick={this.handleLeaveGame}>
+          Leave
+        </button>
         <hr/>
         {
           game.playing &&

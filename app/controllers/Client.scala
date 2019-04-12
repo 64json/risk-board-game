@@ -129,6 +129,18 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       case "proceedWithTurn" => {
         proceedWithTurn()
       }
+      case "attack" => {
+        val (attackingTerritoryId, enemyTerritoryId)  = typedTuple[String, String](args)
+        attack(attackingTerritoryId, enemyTerritoryId)
+      }
+      case "attackDeclaration" => {
+        val (attackingTerritoryId) = typed[String](args)
+        attackDeclaration(attackingTerritoryId)
+      }
+      case "enemyDeclaration" => {
+        val (enemyTerritoryId) = typed[String](args)
+        enemyDeclaration(enemyTerritoryId)
+      }
     }
   }
 
@@ -256,5 +268,39 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "turnIndex"
       )
     )
+  }
+
+  def attackDeclaration(attackingTerritoryId: String): Unit = {
+    val game = getGame()
+    val territory = getTerritory(attackingTerritoryId)
+
+    game.attackDeclaration(territory)
+
+    game.send(
+      "game" -> List(
+        "continents" -> List(
+          "territories"
+        ),
+        "owner"
+      )
+    )
+
+  }
+
+  def enemyDeclaration(enemyTerritoryId: String): Unit = {
+    val game = getGame()
+    val territory = getTerritory(enemyTerritoryId)
+
+    game.enemyDeclaration(territory)
+  }
+
+  def attack(attackingTerritoryId: String, opponentTerritoryId: String): Unit = {
+    val game = getGame()
+    val player = game.players(game.turnIndex.get)
+
+    val attackingTerritory = getTerritory(attackingTerritoryId)
+    val opponentTerritory = getTerritory(opponentTerritoryId)
+    game.attack(attackingTerritory, opponentTerritory)
+
   }
 }

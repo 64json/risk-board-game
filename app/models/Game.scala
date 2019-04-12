@@ -108,5 +108,30 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     player.assignedArmies = player.assignedArmies + Math.max(3, totalTerritoryCount / 3)
   }
 
+  def attack(attacker: Territory, opponent: Territory): Unit = {
+    val player = players(turnIndex.get)
+
+    if (!attacker.adjacencyTerritories.contains(opponent)) throw new Error("You can only attack adjacent territories")
+
+  }
+
+  def attackDeclaration(attackingTerritory: Territory): Unit = {
+    val player = players(turnIndex.get)
+
+    if (!(attackingTerritory.owner == Some && attackingTerritory.owner != player.name))
+      throw new Error("You cannot attack from a territory you do not own")
+    if (!(attackingTerritory.armies == Some && attackingTerritory.armies.get > 1))
+      throw new Error("You must have at least 2 armies in a territory to be able to attack")
+
+  }
+
+  def enemyDeclaration(enemyTerritory: Territory): Unit = {
+    val player = players(turnIndex.get)
+
+    if (enemyTerritory.owner == Some && enemyTerritory.owner == player.name)
+      throw new Error("You cannot attack a territory you own")
+  }
+
+
   def destroy(): Unit = onDestroy(this)
 }
