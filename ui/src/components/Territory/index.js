@@ -33,8 +33,9 @@ class Territory extends Component {
 
     return (
       <div>
+        {armies!==''?<div>Do you want to attack?<div><button>Yes</button><button>No</button></div></div>:''}
         <input type="number" placeholder="# of Armies" value={armies}
-               onChange={this.handleChangeArmies}/>
+               onChange={this.handlegiChangeArmies}/>
         <button onClick={this.handleAssignArmies}>
           Assign
         </button>

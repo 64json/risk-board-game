@@ -20,17 +20,20 @@ class Game extends Component {
   render() {
     const {game, player} = server;
     console.log(server);
+    console.log('game', game)
 
     let playerOnMove = game.playing && game.turnIndex != null && game.players[game.turnIndex];
 
     return (
       <div>
+
         {
           game.playing &&
           <h1>{
             playerOnMove ?
               playerOnMove.id === player ? 'Your turn.' : `${playerOnMove.name}'s turn.` :
               'Waiting on other players to assign their armies.'
+
           }</h1>
         }
         <div>
