@@ -129,6 +129,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       case "proceedWithTurn" => {
         proceedWithTurn()
       }
+      case "compareDice" => {
+        val (diceA, diceB) = typedTuple[Int,Int](args)
+        compareDice(diceA,diceB);
+      }
     }
   }
 
@@ -254,6 +258,18 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "assignedArmies"
         ),
         "turnIndex"
+      )
+    )
+  }
+
+  def compareDice(diceA: Int, diceB: Int): Unit = {
+    val game = getGame()
+    game.compareDice(diceA,diceB)
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "assignedArmies"
+        )
       )
     )
   }
