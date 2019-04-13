@@ -15,6 +15,7 @@ class Continent extends Component {
             <Territory key={territory.id} territory={territory}/>
           ))
         }
+
         <br/>
       </div>
     );

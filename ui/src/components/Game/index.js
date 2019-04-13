@@ -13,8 +13,44 @@ class Game extends Component {
     server.leaveGame();
   };
 
+  defendersDice = () => {
+    return (prompt("Please enter the amount of dice you would like to use (1-2): ", "0"));
+  };
+
   handleProceedWithTurn = () => {
+    const {game, player} = server;
+    if (window.confirm("Would you like to attack this turn?")) {
+      let playerA = game.playing && game.turnIndex != null && game.players[game.turnIndex];
+      let playerB = game.playing && game.turnIndex != null && game.players[game.turnIndex++];
+
+      var armyA = window.prompt("Please enter the amount of dice you would like to use (1-3): ", "0");
+
+
+
+      var armyB = window.prompt("Please enter the amount of dice the enemy will roll (ask them)  (1-2): ", "0");
+      var armyNumA = parseInt(armyA, 10);
+      var armyNumB = parseInt(armyB, 10);
+      server.compareDice(armyNumA, armyNumB);
+    }
     server.proceedWithTurn();
+  };
+
+  handleAttack = () => {
+    let attackingTerritory;
+    let attackingTerritoryName = prompt("Which territory do you want to attack from?", "Name of Territory")
+    if (attackingTerritoryName === null || attackingTerritoryName === "") {
+      attackingTerritory = "Player did not enter a valid territory name"
+    }
+    else attackingTerritory = attackingTerritoryName
+
+    let enemyTerritory;
+    let enemyTerritoryName = prompt("Which territory do you want to attack?", "Name of Enemy Territory")
+    if (enemyTerritoryName === null || enemyTerritoryName === "") {
+      enemyTerritory = "Player did not enter a valid territory name"
+    }
+    else enemyTerritory = enemyTerritoryName
+
+    server.attack(attackingTerritory, enemyTerritory);
   };
 
   render() {
@@ -70,13 +106,20 @@ class Game extends Component {
             game.playing &&
             <button onClick={this.handleProceedWithTurn}
                     disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
-              Proceed With Turn
+              Pass Turn to Next Player
             </button>
           }
-          <button onClick={this.handleLeaveGame}>
-            Leave
-          </button>
+          {
+            game.playing &&
+            <button onClick={this.handleAttack}
+                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+              Attack
+            </button>
+          }
         </div>
+        <button onClick={this.handleLeaveGame}>
+          Leave
+        </button>
         <hr/>
         {
           game.playing &&

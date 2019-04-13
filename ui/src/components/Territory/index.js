@@ -24,12 +24,12 @@ class Territory extends Component {
     this.setState({armies: ''});
   };
 
-
   render() {
     const {territory} = this.props;
     const {armies} = this.state;
     const {game} = server;
     console.log(server);
+
 
     return (
       <div>
@@ -39,7 +39,12 @@ class Territory extends Component {
         <button onClick={this.handleAssignArmies}>
           Assign
         </button>
+
+
         {territory.name} ({territory.owner ? `${game.players.find(player => player.id === territory.owner).name}: ${territory.armies} Armies` : `Not Claimed`})
+
+
+
       </div>
     );
   }

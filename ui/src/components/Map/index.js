@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {SvgLoader, SvgProxy} from 'react-svgmt';
 import svgUrl from './DisneyRiskMapPlain.svg';
 import './stylesheet.css';
+import server from "../../common/server";
 
 class Map extends Component {
   constructor(props) {
@@ -10,6 +11,10 @@ class Map extends Component {
 
     this.state = {
       hoveredCountryId: null,
+      clickedTerritoryIdA: null,
+      clickedTerritoryIdB: null,
+      clickedTerritoryCounter: 0,
+      playerOnMove: null,
     };
   }
 
@@ -23,7 +28,10 @@ class Map extends Component {
     this.setState({hoveredCountryId});
   };
 
+
   render() {
+    const {game, player} = server;
+    let playerOnMove = game.playing && game.turnIndex != null && game.players[game.turnIndex];
     const {hoveredCountryId} = this.state;
 
     return (

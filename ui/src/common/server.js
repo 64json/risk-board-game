@@ -89,8 +89,16 @@ class Server {
     this.send('assignArmies', [territoryId, armies]);
   }
 
+  compareDice(diceA, diceB) {
+    this.send('compareDice', [diceA, diceB]);
+  }
+
   proceedWithTurn() {
     this.send('proceedWithTurn', []);
+  }
+
+  attack(attackingTerritoryId, enemyTerritoryId) {
+    this.send('attack', [attackingTerritoryId, enemyTerritoryId]);
   }
 }
 
