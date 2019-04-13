@@ -1,4 +1,4 @@
-class Server {
+class Socket {
   open(onChange) {
     this.connected = false;
     this.games = [];
@@ -60,9 +60,8 @@ class Server {
         });
       };
       deepMerge(this, data);
-
-      if (onChange) onChange(data);
     }
+    if (onChange) onChange(this);
   }
 
   send(method, args) {
@@ -89,18 +88,26 @@ class Server {
     this.send('assignArmies', [territoryId, armies]);
   }
 
-  compareDice(diceA, diceB) {
-    this.send('compareDice', [diceA, diceB]);
+  createAttack(fromTerritoryId, toTerritoryId, attackingDiceCount) {
+    this.send('createAttack', [fromTerritoryId, toTerritoryId, attackingDiceCount]);
   }
 
-  proceedWithTurn() {
-    this.send('proceedWithTurn', []);
+  defend(defendingDiceCount) {
+    this.send('defend', [defendingDiceCount]);
   }
 
-  attack(attackingTerritoryId, enemyTerritoryId) {
-    this.send('attack', [attackingTerritoryId, enemyTerritoryId]);
+  endAttack() {
+    this.send('endAttack', []);
+  }
+
+  fortify(fromTerritoryId, toTerritoryId, armies) {
+    this.send('fortify', [fromTerritoryId, toTerritoryId, armies]);
+  }
+
+  endFortify() {
+    this.send('endFortify', []);
   }
 }
 
-const server = new Server();
+const server = new Socket();
 export default server;

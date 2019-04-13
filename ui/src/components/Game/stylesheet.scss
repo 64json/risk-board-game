@@ -1,0 +1,121 @@
+@import "../../common/constants";
+
+.Game {
+  flex: 1;
+  display: flex;
+
+  .sidebar {
+    width: 20vw;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      align-self: center;
+      font-size: $font-size-large;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .players {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+
+      .player {
+        flex: 1;
+        padding: .5rem;
+        display: flex;
+
+        .turn {
+          font-weight: bold;
+        }
+
+        .name {
+          flex: 1;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+
+          &.you {
+            &:after {
+              content: ' (You)';
+              font-weight: normal;
+              font-size: $font-size-small;
+            }
+          }
+        }
+
+        .status {
+
+        }
+
+        &.current {
+          border: 2px solid;
+        }
+
+        &.player-1 {
+          border-color: $color-player-1;
+          color: $color-player-1;
+        }
+
+        &.player-2 {
+          border-color: $color-player-2;
+          color: $color-player-2;
+        }
+
+        &.player-3 {
+          border-color: $color-player-3;
+          color: $color-player-3;
+        }
+
+        &.player-4 {
+          border-color: $color-player-4;
+          color: $color-player-4;
+        }
+
+        &.player-5 {
+          border-color: $color-player-5;
+          color: $color-player-5;
+        }
+
+        &.player-6 {
+          border-color: $color-player-6;
+          color: $color-player-6;
+        }
+      }
+    }
+
+    .instruction {
+      font-size: $font-size-large;
+    }
+  }
+
+  .board {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+
+    .map {
+      width: 64vw;
+      height: 40vw;
+      position: relative;
+      margin: $territory-height / 2 $territory-width / 2;
+      user-select: none;
+
+      .svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+
+        .link {
+          stroke: red;
+          stroke-width: .1px;
+        }
+      }
+    }
+
+  }
+}

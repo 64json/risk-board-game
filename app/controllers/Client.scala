@@ -100,6 +100,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         call(action.method, action.args)
       } catch {
         case e: Throwable =>
+          e.printStackTrace
           error = Some(e.getMessage)
           send("error")
       }
@@ -108,38 +109,41 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
   // maps method name to the actual method
   def call(method: String, args: List[JsValue]): Unit = {
     method match {
-      case "createGame" => {
+      case "createGame" =>
         val (gameName, ownerName) = typedTuple[String, String](args)
         createGame(gameName, ownerName)
-      }
-      case "joinGame" => {
+
+      case "joinGame" =>
         val (gameId, playerName) = typedTuple[String, String](args)
         joinGame(gameId, playerName)
-      }
-      case "leaveGame" => {
+
+      case "leaveGame" =>
         leaveGame()
-      }
-      case "startGame" => {
+
+      case "startGame" =>
         startGame()
-      }
-      case "assignArmies" => {
+
+      case "assignArmies" =>
         val (territoryId, armies) = typedTuple[String, Int](args)
         assignArmies(territoryId, armies)
-      }
-      case "proceedWithTurn" => {
-        proceedWithTurn()
-      }
 
-      case "attack" => {
-        val (attackingTerritoryId, enemyTerritoryId) = typedTuple[String, String](args)
-        attack(attackingTerritoryId, enemyTerritoryId)
-      }
+      case "createAttack" =>
+        val (fromTerritoryId, toTerritoryId, attackingDiceCount) = typedTuple[String, String, Int](args)
+        createAttack(fromTerritoryId, toTerritoryId, attackingDiceCount)
 
-      case "compareDice" => {
-        val (diceA, diceB) = typedTuple[Int,Int](args)
-        compareDice(diceA,diceB);
+      case "defend" =>
+        val defendingDiceCount = typed[Int](args)
+        defend(defendingDiceCount)
 
-      }
+      case "endAttack" =>
+        endAttack()
+
+      case "fortify" =>
+        val (fromTerritoryId, toTerritoryId, armies) = typedTuple[String, String, Int](args)
+        fortify(fromTerritoryId, toTerritoryId, armies)
+
+      case "endFortify" =>
+        endFortify()
     }
   }
 
@@ -214,9 +218,11 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     game.send(
       "game" -> List(
         "playing",
-        "turnIndex",
         "players" -> List(
-          "assignedArmies"
+          "assignedArmies",
+          "assigning",
+          "attacking",
+          "fortifying",
         ),
         "turnIndex",
         "continents" -> List(
@@ -235,12 +241,15 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
   def assignArmies(territoryId: String, armies: Int): Unit = {
     val game = getGame()
     val territory = getTerritory(territoryId)
+    if (!player.get.assigning) throw new Error("This is not your turn.");
     game.assignArmies(player.get, territory, armies)
 
     game.send(
       "game" -> List(
         "players" -> List(
-          "assignedArmies"
+          "assignedArmies",
+          "assigning",
+          "attacking",
         ),
         "turnIndex",
         "continents" -> List(
@@ -253,42 +262,115 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     )
   }
 
-  def proceedWithTurn(): Unit = {
+  def createAttack(fromTerritoryId: String, toTerritoryId: String, attackingDiceCount: Int): Unit = {
     val game = getGame()
-    val player = game.players(game.turnIndex.get)
-    if (player.client != this) throw new Error(s"This is not ${player.name}'s turn.")
-    game.proceedWithTurn()
+    val fromTerritory = game.findTerritory(fromTerritoryId)
+    val toTerritory = game.findTerritory(toTerritoryId)
+    if (!player.get.attacking) throw new Error("This is not your turn.")
+    if (fromTerritory.isEmpty) throw new Error("Invalid attacking territory.")
+    if (toTerritory.isEmpty) throw new Error("Invalid defending territory.")
+    if (!fromTerritory.get.owner.contains(player.get)) throw new Error("You don't own the attacking territory.")
+    if (toTerritory.get.owner.contains(player.get)) throw new Error("You already own the defending territory.")
+    game.createAttack(fromTerritory.get, toTerritory.get, attackingDiceCount)
 
     game.send(
       "game" -> List(
-        "players" -> List(
-          "assignedArmies"
-        ),
-        "turnIndex"
-      )
-    )
-  }
-
-
-  def attack(attackingTerritoryId: String, enemyTerritoryId: String): Unit = {
-    val game = getGame()
-    val player = game.players(game.turnIndex.get)
-    if (player.client != this) throw new Error(s"This is not ${player.name}'s turn.")
-
-    game.attack(attackingTerritoryId, enemyTerritoryId)
-  }
-
-  def compareDice(diceA: Int, diceB: Int): Unit = {
-    val game = getGame()
-    game.compareDice(diceA,diceB)
-    game.send(
-      "game" -> List(
-        "players" -> List(
-          "assignedArmies"
+        "attack" -> List(
+          "fromTerritory",
+          "toTerritory",
+          "attackingDiceCount",
+          "defendingDiceCount",
+          "attackingDice",
+          "defendingDice",
+          "done",
         )
       )
     )
   }
 
+  def defend(defendingDiceCount: Int): Unit = {
+    val game = getGame()
+    if (game.attack.isEmpty || game.attack.get.done) throw new Error("There is no ongoing attack.")
+    if (!game.attack.get.toTerritory.owner.contains(player.get)) throw new Error("You don't own the defending territory.")
+    game.defend(defendingDiceCount)
+
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "attacking",
+          "fortifying",
+        ),
+        "continents" -> List(
+          "territories" -> List(
+            "owner",
+            "armies"
+          )
+        ),
+        "attack" -> List(
+          "defendingDiceCount",
+          "attackingDice",
+          "defendingDice",
+          "done",
+        )
+      )
+    )
+  }
+
+  def endAttack(): Unit = {
+    val game = getGame()
+    game.endAttack(player.get)
+
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "attacking",
+          "fortifying",
+        ),
+      )
+    )
+  }
+
+  def fortify(fromTerritoryId: String, toTerritoryId: String, armies: Int): Unit = {
+    val game = getGame()
+    val fromTerritory = game.findTerritory(fromTerritoryId)
+    val toTerritory = game.findTerritory(toTerritoryId)
+    if (!player.get.fortifying) throw new Error("This is not your turn.")
+    if (fromTerritory.isEmpty) throw new Error("Invalid attacking territory.")
+    if (toTerritory.isEmpty) throw new Error("Invalid defending territory.")
+    if (!fromTerritory.get.owner.contains(player.get)) throw new Error("You don't own the territory.")
+    if (!toTerritory.get.owner.contains(player.get)) throw new Error("You don't own the territory.")
+    game.fortify(fromTerritory.get, toTerritory.get, armies)
+
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "assignedArmies",
+          "assigning",
+          "fortifying",
+        ),
+        "turnIndex",
+        "continents" -> List(
+          "territories" -> List(
+            "armies"
+          )
+        ),
+      )
+    )
+  }
+
+  def endFortify(): Unit = {
+    val game = getGame()
+    game.endFortify(player.get)
+
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "assignedArmies",
+          "assigning",
+          "fortifying",
+        ),
+        "turnIndex",
+      )
+    )
   }
 }

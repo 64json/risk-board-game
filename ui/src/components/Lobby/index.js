@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
+import {connect} from 'react-redux';
+import socket from '../../common/socket';
+import {actions} from '../../reducers';
 
-import server from '../../common/server';
 import './stylesheet.css';
 
 class Lobby extends Component {
@@ -18,30 +20,34 @@ class Lobby extends Component {
   };
 
   handleCreateGame = e => {
+    e.preventDefault();
+
     const {gameName} = this.state;
-    const playerName = window.prompt('Please enter the player name.');
-    server.createGame(gameName, playerName);
+    this.props.prompt('Please enter the player name.', playerName => {
+      socket.createGame(gameName, playerName);
+    });
   };
 
   handleJoinGame = gameId => {
-    const playerName = window.prompt('Please enter the player name.');
-    server.joinGame(gameId, playerName);
+    this.props.prompt('Please enter the player name.', playerName => {
+      socket.joinGame(gameId, playerName);
+    });
   };
 
   render() {
+    const {games} = this.props.server;
     const {gameName} = this.state;
-    const {games} = server;
 
     return (
-      <div>
-        <div>
+      <div className="Lobby">
+        <form onSubmit={this.handleCreateGame}>
           <input type="text" value={gameName}
                  placeholder="Game Name"
                  onChange={this.handleChangeGameName}/>
-          <button onClick={this.handleCreateGame}>
+          <button>
             Create Game
           </button>
-        </div>
+        </form>
         {
           games.map(game => (
             <div key={game.id}>
@@ -58,4 +64,4 @@ class Lobby extends Component {
   }
 }
 
-export default Lobby;
+export default connect(({server}) => ({server}), actions)(Lobby);

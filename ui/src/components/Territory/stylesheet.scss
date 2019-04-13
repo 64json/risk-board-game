@@ -1,0 +1,16 @@
+@import "../../common/constants";
+
+.Territory {
+  position: absolute;
+  height: $territory-height;
+  width: $territory-width;
+  margin-top: -$territory-height/2;
+  margin-left: -$territory-width/2;
+  padding: .5em;
+  border: .2em solid red;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: white;
+  font-size: .64vw;
+}

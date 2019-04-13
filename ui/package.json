@@ -9,11 +9,14 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "node-sass": "^4.11.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-redux": "^7.0.2",
     "react-router-dom": "^4.3.1",
     "react-scripts": "^2.1.5",
-    "react-svgmt": "^1.1.7"
+    "redux": "^4.0.1",
+    "redux-actions": "^2.6.5"
   },
   "devDependencies": {
     "ncp": "^2.0.0",

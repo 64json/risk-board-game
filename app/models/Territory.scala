@@ -3,9 +3,10 @@ package models
 import models.interface.Identifiable
 
 class Territory(val name: String) extends Identifiable {
+  // TODO: there cannot be an empty territory. how to prevent?
   var adjacencyTerritories: List[Territory] = List()
   var owner: Option[Player] = None
-  var armies: Option[Int] = None
+  var armies: Int = 0
 
   def border(territories: Territory*): Unit = {
     adjacencyTerritories ++= territories
@@ -13,7 +14,7 @@ class Territory(val name: String) extends Identifiable {
 
   def reset(): Unit = {
     owner = None
-    armies = None
+    armies = 0
   }
 
   override def fields = Map(

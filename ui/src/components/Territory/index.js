@@ -1,53 +1,29 @@
 import React, {Component} from 'react';
-
-import server from '../../common/server';
-import './stylesheet.css';
+import {connect} from 'react-redux';
+import {actions} from '../../reducers';
+import './stylesheet.scss';
 
 class Territory extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      armies: '',
-    };
-  }
-
-  handleChangeArmies = e => {
-    const armies = e.target.value;
-    this.setState({armies});
-  };
-
-  handleAssignArmies = e => {
-    const {territory} = this.props;
-    const {armies} = this.state;
-    server.assignArmies(territory.id, Number(armies) | 0);
-    this.setState({armies: ''});
+  handleClick = e => {
+    const {territory, onClick} = this.props;
+    if (onClick) onClick(territory);
   };
 
   render() {
-    const {territory} = this.props;
-    const {armies} = this.state;
-    const {game} = server;
-    console.log(server);
-
+    const {territory, style} = this.props;
+    const {game} = this.props.server;
 
     return (
-      <div>
-        {armies!==''?<div>Do you want to attack?<div><button>Yes</button><button>No</button></div></div>:''}
-        <input type="number" placeholder="# of Armies" value={armies}
-               onChange={this.handlegiChangeArmies}/>
-        <button onClick={this.handleAssignArmies}>
-          Assign
-        </button>
-
-
-        {territory.name} ({territory.owner ? `${game.players.find(player => player.id === territory.owner).name}: ${territory.armies} Armies` : `Not Claimed`})
-
-
-
+      <div className="Territory" style={style} onClick={this.handleClick}>
+        <span className="name">
+          {territory.name}
+        </span>
+        <span className="owner">
+          ({territory.owner ? `${game.players.find(player => player.id === territory.owner).name}: ${territory.armies} Armies` : `Not Claimed`})
+        </span>
       </div>
     );
   }
 }
 
-export default Territory;
+export default connect(({server}) => ({server}), actions)(Territory);

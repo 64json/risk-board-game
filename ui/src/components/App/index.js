@@ -1,41 +1,79 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router} from 'react-router-dom';
-
-import server from '../../common/server';
+import {connect} from 'react-redux';
+import socket from '../../common/socket';
+import {actions} from '../../reducers';
 import {Game, Lobby} from '../';
-import './stylesheet.css';
+import './stylesheet.scss';
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      answer: '',
+    };
+  }
+
+
   componentDidMount() {
-    server.open(() => this.forceUpdate());
+    socket.open(this.props.updateData);
   }
 
   componentWillUnmount() {
-    server.close();
+    socket.close();
   }
 
+  handleChangeAnswer = e => {
+    const answer = e.target.value;
+    this.setState({answer});
+  };
+
+  handleSubmitAnswer = e => {
+    e.preventDefault();
+
+    const {onAnswer} = this.props.dialog;
+    const {answer} = this.state;
+    onAnswer(answer);
+    this.handleCloseDialog();
+  };
+
+  handleCloseDialog = e => {
+    this.setState({answer: ''});
+    this.props.prompt(null, null);
+  };
+
   render() {
-    const {connected, game, player} = server;
+    const {question} = this.props.dialog;
+    const {connected, game, player} = this.props.server;
+    const {answer} = this.state;
 
     return (
-      <Router>
-        <div className="App">
-          <div>{connected ? 'Connected' : 'Connecting ...'}</div>
-          <hr/>
-          {
-            connected &&
-            <div>
-              {
-                game && player ?
-                  <Game/> :
-                  <Lobby/>
-              }
+      <div className="App">
+        {
+          connected && (
+            game && player ?
+              <Game/> :
+              <Lobby/>
+          )
+        }
+        {
+          question &&
+          <form className="dialog" onSubmit={this.handleSubmitAnswer}>
+            <div className="question">
+              {question}
             </div>
-          }
-        </div>
-      </Router>
+            <input className="answer" type="text" autoFocus value={answer}
+                   onChange={this.handleChangeAnswer}/>
+            <div className="buttons">
+              <button>Submit</button>
+              <button type="button" onClick={this.handleCloseDialog}>Cancel
+              </button>
+            </div>
+          </form>
+        }
+      </div>
     );
   }
 }
 
-export default App;
+export default connect(({dialog, server}) => ({dialog, server}), actions)(App);

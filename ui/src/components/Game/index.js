@@ -1,138 +1,252 @@
 import React, {Component} from 'react';
-
-import server from '../../common/server';
-import {Continent, Map} from '../';
-import './stylesheet.css';
+import {connect} from 'react-redux';
+import socket from '../../common/socket';
+import {classes} from '../../common/utils';
+import {Territory} from '../../components';
+import {actions} from '../../reducers';
+import coords from './coords';
+import './stylesheet.scss';
 
 class Game extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      fromTerritoryId: null,
+    };
+  }
+
   handleStartGame = () => {
-    server.startGame();
+    socket.startGame();
   };
 
   handleLeaveGame = () => {
-    server.leaveGame();
+    socket.leaveGame();
   };
 
-  defendersDice = () => {
-    return (prompt("Please enter the amount of dice you would like to use (1-2): ", "0"));
+  handleEndAttack = () => {
+    socket.endAttack();
   };
 
-  handleProceedWithTurn = () => {
-    const {game, player} = server;
-    if (window.confirm("Would you like to attack this turn?")) {
-      let playerA = game.playing && game.turnIndex != null && game.players[game.turnIndex];
-      let playerB = game.playing && game.turnIndex != null && game.players[game.turnIndex++];
-
-      var armyA = window.prompt("Please enter the amount of dice you would like to use (1-3): ", "0");
-
-
-
-      var armyB = window.prompt("Please enter the amount of dice the enemy will roll (ask them)  (1-2): ", "0");
-      var armyNumA = parseInt(armyA, 10);
-      var armyNumB = parseInt(armyB, 10);
-      server.compareDice(armyNumA, armyNumB);
-    }
-    server.proceedWithTurn();
+  handleEndFortify = () => {
+    socket.endFortify();
   };
 
-  handleAttack = () => {
-    let attackingTerritory;
-    let attackingTerritoryName = prompt("Which territory do you want to attack from?", "Name of Territory")
-    if (attackingTerritoryName === null || attackingTerritoryName === "") {
-      attackingTerritory = "Player did not enter a valid territory name"
-    }
-    else attackingTerritory = attackingTerritoryName
+  handleAssignArmies = territory => {
+    this.props.prompt('Enter the number of armies to assign: ', armies => {
+      socket.assignArmies(territory.id, Number(armies) | 0);
+    });
+  };
 
-    let enemyTerritory;
-    let enemyTerritoryName = prompt("Which territory do you want to attack?", "Name of Enemy Territory")
-    if (enemyTerritoryName === null || enemyTerritoryName === "") {
-      enemyTerritory = "Player did not enter a valid territory name"
-    }
-    else enemyTerritory = enemyTerritoryName
+  handleClickFromTerritory = territory => {
+    const fromTerritoryId = territory.id;
+    this.setState({fromTerritoryId});
+  };
 
-    server.attack(attackingTerritory, enemyTerritory);
+  handleAttack = territory => {
+    const {fromTerritoryId} = this.state;
+    const toTerritoryId = territory.id;
+    this.props.prompt('Enter the number of attacking dice to roll: ', attackingDiceCount => {
+      socket.createAttack(fromTerritoryId, toTerritoryId, Number(attackingDiceCount) | 0);
+      this.setState({fromTerritoryId: null});
+    });
+  };
+
+  handleFortify = territory => {
+    const {fromTerritoryId} = this.state;
+    const toTerritoryId = territory.id;
+    this.props.prompt('Enter the number of armies to move: ', armies => {
+      socket.fortify(fromTerritoryId, toTerritoryId, Number(armies) | 0);
+      this.setState({fromTerritoryId: null});
+    });
+  };
+
+  getInstruction = () => {
+    const {game, player} = this.props.server;
+    if (!game.playing) {
+      return {
+        text: 'Waiting ...',
+      };
+    } else {
+      const me = game.players.find(p => p.id === player);
+      if (me.assigning) {
+        return {
+          text: 'Choose your territory to assign your armies to.',
+          onClick: this.handleAssignArmies,
+        };
+      } else if (me.attacking) {
+        const {fromTerritoryId} = this.state;
+        if (!fromTerritoryId) {
+          return {
+            text: 'Choose your territory to attack with.',
+            onClick: this.handleClickFromTerritory,
+          };
+        } else {
+          return {
+            text: 'Choose the territory to attack.',
+            onClick: this.handleAttack,
+          };
+        }
+      } else if (me.fortifying) {
+        const {fromTerritoryId} = this.state;
+        if (!fromTerritoryId) {
+          return {
+            text: 'Choose your territory to move armies from.',
+            onClick: this.handleClickFromTerritory,
+          };
+        } else {
+          return {
+            text: 'Choose your territory to move armies to.',
+            onClick: this.handleFortify,
+          };
+        }
+      } else if (game.turnIndex === null) {
+        return {
+          text: 'Waiting on others to assign their armies.',
+        };
+      } else {
+        const currentPlayer = game.players[game.turnIndex];
+        if (game.attack && !game.attack.done) {
+          const territories = game.continents.flatMap(continent => continent.territories);
+          const attackingTerritory = territories.find(territory => territory.id === game.attack.fromTerritory);
+          const defendingTerritory = territories.find(territory => territory.id === game.attack.toTerritory);
+          const attackingPlayer = game.players.find(player => player.id === attackingTerritory.owner);
+          if (defendingTerritory.owner === player) {
+            this.props.prompt(`${attackingPlayer.name} is attacking your ${defendingTerritory.name}. Enter the number of defending dice to roll: `, defendingDiceCount => {
+              socket.defend(Number(defendingDiceCount) | 0);
+            });
+          }
+        }
+        return {
+          text: `${currentPlayer.name} is ${currentPlayer.assigning ? 'assign' : currentPlayer.attacking ? 'attack' : currentPlayer.fortifying ? 'fortify' : 'doing someth'}ing.`,
+        };
+      }
+    }
   };
 
   render() {
-    const {game, player} = server;
-    console.log(server);
-    console.log('game', game)
+    const {game, player} = this.props.server;
+    const instruction = this.getInstruction();
 
-    let playerOnMove = game.playing && game.turnIndex != null && game.players[game.turnIndex];
+    let currentPlayer = game.players[game.turnIndex];
+
+    let territories = null;
+    const links = [];
+    if (game.playing) {
+      territories = game.continents.flatMap(continent => continent.territories);
+      territories.forEach(territory => {
+        territory.adjacencyTerritories.forEach(adjacencyTerritory => {
+          const link = {
+            from: territories.indexOf(territory),
+            to: territories.findIndex(t => t.id === adjacencyTerritory),
+          };
+          if (!links.find(l => l.from === link.to && l.to === link.from)) {
+            links.push(link);
+          }
+        });
+      });
+    }
 
     return (
-      <div>
-
-        {
-          game.playing &&
-          <h1>{
-            playerOnMove ?
-              playerOnMove.id === player ? 'Your turn.' : `${playerOnMove.name}'s turn.` :
-              'Waiting on other players to assign their armies.'
-
-          }</h1>
-        }
-        <div>
-          Game: {game.name}
-        </div>
-        <div>
-          Player: {game.players.find(p => p.id === player).name}
-        </div>
-        {
-          game.playing ?
-            <div>
-              Players: {
-              game.players
-                .map((player, i) => `${player.name} (${player.id === game.owner ? 'owner / ' : ''}armies: ${player.assignedArmies} / turn: ${i + 1})`).join(', ')
-            }
-            </div> :
-            <div>
-              Players: {game.players.map(player => `${player.name}${player.id === game.owner ? ' (owner)' : ''}`).join(', ')}
-            </div>
-        }
-        <div>
-          <div>
+      <div className="Game">
+        <div className="sidebar">
+          <div className="title">
+            {game.name}
+          </div>
+          <div className="players">
             {
-              game.playing ? 'Playing ...' : 'Waiting ...'
+              game.players.map((player, i) => {
+                return (
+                  <div key={player.id}
+                       className={classes('player', game.playing && `player-${i + 1}`, currentPlayer && currentPlayer.id === player.id && 'current')}>
+                    {
+                      game.playing &&
+                      <span className="turn">
+                        {i + 1}.&nbsp;
+                      </span>
+                    }
+                    <span
+                      className={classes('name', socket.player === player.id && 'you')}>
+                      {player.name}
+                    </span>
+                    <span className="status">
+                      {
+                        game.playing ?
+                          `${player.assignedArmies} armies` :
+                          player.id === game.owner && 'Host'
+                      }
+                    </span>
+                  </div>
+                );
+              })
             }
           </div>
-          {
-            player === game.owner && !game.playing &&
-            <button onClick={this.handleStartGame}>
-              Start
+          <div className="instruction">
+            {instruction.text}
+          </div>
+          <div className="actions">
+            {
+              player === game.owner && !game.playing &&
+              <button onClick={this.handleStartGame}>
+                Start
+              </button>
+            }
+            {
+              currentPlayer && currentPlayer.id === player && currentPlayer.attacking &&
+              <button onClick={this.handleEndAttack}>
+                End Attack
+              </button>
+            }
+            {
+              currentPlayer && currentPlayer.id === player && currentPlayer.fortifying &&
+              <button onClick={this.handleEndFortify}>
+                Skip Fortifying
+              </button>
+            }
+            <button onClick={this.handleLeaveGame}>
+              Leave
             </button>
-          }
+          </div>
+        </div>
+        <div className="board">
           {
-            game.playing &&
-            <button onClick={this.handleProceedWithTurn}
-                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
-              Pass Turn to Next Player
-            </button>
-          }
-          {
-            game.playing &&
-            <button onClick={this.handleAttack}
-                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
-              Attack
-            </button>
+            game.playing && (
+              <div className="map">
+                <svg viewBox="0 0 80 50" preserveAspectRatio="none"
+                     className="svg">
+                  {
+                    links.map(({from, to}) => {
+                      const {x: fromX, y: fromY} = coords[from];
+                      const {x: toX, y: toY} = coords[to];
+                      return (
+                        <line className="link" key={from + ' ' + to}
+                              x1={fromX * 80} y1={fromY * 50}
+                              x2={toX * 80} y2={toY * 50}/>
+                      );
+                    })
+                  }
+                </svg>
+                {
+                  territories.map((territory, i) => {
+                    const {x, y} = coords[i];
+                    return (
+                      <Territory key={territory.id} territory={territory}
+                                 onClick={instruction.onClick}
+                                 style={{
+                                   top: `${(y * 100).toFixed(2)}%`,
+                                   left: `${(x * 100).toFixed(2)}%`,
+                                 }}/>
+                    );
+                  })
+                }
+              </div>
+            )
           }
         </div>
-        <button onClick={this.handleLeaveGame}>
-          Leave
-        </button>
-        <hr/>
-        {
-          game.playing &&
-          game.continents.map(continent => (
-            <Continent key={continent.id} continent={continent}/>
-          ))
-        }
-        <hr/>
-        <Map/>
       </div>
     );
   }
 }
 
-export default Game;
+export default connect(({server}) => ({server}), actions)(Game);
 

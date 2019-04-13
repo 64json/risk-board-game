@@ -1,10 +1,7 @@
 package models
 
-import java.util
-
 import controllers.Client
 import models.interface.{Identifiable, Receivable}
-import play.api.libs.json.{JsArray, JsValue, Json}
 
 import scala.util.Random
 
@@ -14,6 +11,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   var owner: Player = join(ownerName, ownerClient)
   var turnIndex: Option[Int] = None
   var continents: Option[List[Continent]] = None
+  var attack: Option[Attack] = None
 
   override def fields = Map(
     "id" -> id,
@@ -23,6 +21,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     "owner" -> owner,
     "turnIndex" -> turnIndex,
     "continents" -> continents,
+    "attack" -> attack,
   )
 
   override def receivers: List[Client] = players.map(_.client)
@@ -67,35 +66,37 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
 
     playing = true
     val assignedArmies = 20 + (6 - players.length) * 5
-    players.foreach(player => player.assignedArmies = assignedArmies)
+    players.foreach(player => {
+      player.assignedArmies = assignedArmies
+      player.assigning = true
+    })
     players = Random.shuffle(players)
     turnIndex = None
     continents = Some(Continent.createContinents)
   }
 
-  def nextTurn(): Unit = {
-    turnIndex = Some(turnIndex.get + 1)
-  }
-
   def getContinents: Option[List[Continent]] = continents
+
+  def getTerritories = continents.get.flatMap(_.territories)
+
+  def findTerritory(territoryId: String): Option[Territory] = getTerritories.find(_.id == territoryId)
 
   def assignArmies(player: Player, territory: Territory, armies: Int): Unit = {
     if (armies < 1) throw new Error("You need to assign at least one dude.")
     if (armies > player.assignedArmies) throw new Error("You do not have enough army dudes available.")
-    if (territory.owner.isDefined && territory.owner.get != player) throw new Error(s"This is not ${player.name}'s territory.")
+    if (territory.owner.isDefined && territory.owner.get != player) throw new Error("This is not your territory.")
     territory.owner = Some(player)
-    territory.armies = Some(territory.armies.getOrElse(0) + armies)
+    territory.armies += armies
     player.assignedArmies -= armies
-    if (turnIndex.isEmpty && players.forall(_.assignedArmies == 0)) {
-      turnIndex = Some(0)
-      giveArmies()
+    if (player.assignedArmies == 0) {
+      player.assigning = false
+      if (turnIndex.isDefined) {
+        player.attacking = true
+      } else if (players.forall(_.assignedArmies == 0)) {
+        turnIndex = Some(0)
+        giveArmies()
+      }
     }
-  }
-
-  def proceedWithTurn(): Unit = {
-    //if (players(turnIndex.get).assignedArmies > 0) throw new Error(s"All the armies should be assigned before proceeding with turn.") TODO: Error should only occur at beginning of players turn.
-    turnIndex = Some((turnIndex.get + 1) % players.length)
-    giveArmies()
   }
 
   def giveArmies(): Unit = {
@@ -109,41 +110,46 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
       totalTerritoryCount = totalTerritoryCount + continentTerritoryCount
     })
     player.assignedArmies = player.assignedArmies + Math.max(3, totalTerritoryCount / 3)
+    player.assigning = true
   }
 
 
-  def attack(attackingTerritoryId: String, enemyTerritoryId: String): Unit = {
-    val player = players(turnIndex.get)
-    val attackingTerritory = continents.get.foreach(continent => {
-      val continentTerritories = continent.territories
-      continentTerritories.foreach(territory => {
-        if (territory.name == attackingTerritoryId) {
-          if (territory.owner == Some && territory.owner != player) {
-            throw new Error("You cannot attack from a territory you don't own")
-          } else {
-            territory
-          }
-        }
-      })
-    })
+  def createAttack(fromTerritory: Territory, toTerritory: Territory, attackingDiceCount: Int): Unit = {
+    if (attack.isDefined && !attack.get.done) throw new Error("There already is an ongoing attack.")
+    if (!fromTerritory.adjacencyTerritories.contains(toTerritory)) throw new Error("You can only attack a neighbor territory.")
+    if (fromTerritory.armies <= toTerritory.armies) throw new Error("The attacking territory must have at least one more army than the defending territory.")
+    if (attackingDiceCount > 3) throw new Error("The attacking dice cannot be more than 3.")
+    if (attackingDiceCount < 1) throw new Error("The attacking dice cannot be less than 1.")
+    if (attackingDiceCount >= fromTerritory.armies) throw new Error("You must have at least one more army than dice being rolled.")
+    attack = Some(new Attack(fromTerritory, toTerritory, attackingDiceCount))
   }
 
-    val enemyTerritory = continents.get.foreach(continent => {
-      val continentTerritories = continent.territories
-      continentTerritories.foreach(territory => {
-        if (territory.name == enemyTerritoryId) {
-          if (territory.owner == Some && territory.owner == player) {
-            throw new Error("You cannot attack a territory you own")
-          } else if (!(territory.adjacencyTerritories.contains(attackingTerritory))) {
-            throw new Error("You cannot attack a non-adjacent territory")
-          } else {
-            territory
-          }
-        }
-      })
-    })
+  def defend(defendingDiceCount: Int): Unit = {
+    if (defendingDiceCount > 2) throw new Error("The defending dice cannot be more than 2.")
+    if (defendingDiceCount < 1) throw new Error("The defending dice cannot be less than 1.")
+    if (defendingDiceCount > attack.get.toTerritory.armies) throw new Error("You must have at least as many armies as dice being rolled.")
+    attack.get.defend(defendingDiceCount)
   }
 
+  def endAttack(player: Player): Unit = {
+    if (attack.isDefined && !attack.get.done) throw new Error("There already is an ongoing attack.")
+    player.attacking = false
+    player.fortifying = true
+  }
+
+  def fortify(fromTerritory: Territory, toTerritory: Territory, armies: Int): Unit = {
+    if (!fromTerritory.adjacencyTerritories.contains(toTerritory)) throw new Error("You can only fortify a neighbor territory.")
+    if (armies >= fromTerritory.armies) throw new Error("You must leave at least one army.")
+    fromTerritory.armies -= armies
+    toTerritory.armies += armies
+    endFortify(fromTerritory.owner.get)
+  }
+
+  def endFortify(player: Player): Unit = {
+    player.fortifying = false
+    turnIndex = Some((turnIndex.get + 1) % players.length)
+    giveArmies()
+  }
 
   def destroy(): Unit = onDestroy(this)
 }
