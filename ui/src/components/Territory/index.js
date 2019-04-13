@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {actions} from '../../reducers';
+import {classes} from '../../common/utils';
 import './stylesheet.scss';
 
 class Territory extends Component {
@@ -10,17 +11,21 @@ class Territory extends Component {
   };
 
   render() {
-    const {territory, style} = this.props;
+    const {territory, style, className} = this.props;
     const {game} = this.props.server;
 
     return (
-      <div className="Territory" style={style} onClick={this.handleClick}>
+      <div className={classes('Territory', className)} style={style}
+           onClick={this.handleClick}>
         <span className="name">
           {territory.name}
         </span>
-        <span className="owner">
-          ({territory.owner ? `${game.players.find(player => player.id === territory.owner).name}: ${territory.armies} Armies` : `Not Claimed`})
-        </span>
+        {
+          territory.owner &&
+          <span className="armies">
+            {territory.armies} armies
+          </span>
+        }
       </div>
     );
   }

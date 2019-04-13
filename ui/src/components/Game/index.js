@@ -229,13 +229,16 @@ class Game extends Component {
                 {
                   territories.map((territory, i) => {
                     const {x, y} = coords[i];
+                    const playerIndex = game.players.findIndex(p => p.id === territory.owner);
                     return (
-                      <Territory key={territory.id} territory={territory}
-                                 onClick={instruction.onClick}
-                                 style={{
-                                   top: `${(y * 100).toFixed(2)}%`,
-                                   left: `${(x * 100).toFixed(2)}%`,
-                                 }}/>
+                      <Territory
+                        className={territory.owner && `player-${playerIndex + 1}`}
+                        key={territory.id} territory={territory}
+                        onClick={instruction.onClick}
+                        style={{
+                          top: `${(y * 100).toFixed(2)}%`,
+                          left: `${(x * 100).toFixed(2)}%`,
+                        }}/>
                     );
                   })
                 }

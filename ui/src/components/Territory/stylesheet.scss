@@ -4,13 +4,60 @@
   position: absolute;
   height: $territory-height;
   width: $territory-width;
+  border-radius: $territory-width;
   margin-top: -$territory-height/2;
   margin-left: -$territory-width/2;
   padding: .5em;
-  border: .2em solid red;
+  border: .2em solid $color-unclaimed;
+  color: $color-unclaimed;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   background-color: white;
   font-size: .64vw;
+
+  .name {
+    font-weight: bold;
+    margin-bottom: .5em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .armies {
+
+  }
+
+  &.player-1 {
+    border-color: $color-player-1;
+    color: $color-player-1;
+  }
+
+  &.player-2 {
+    border-color: $color-player-2;
+    color: $color-player-2;
+  }
+
+  &.player-3 {
+    border-color: $color-player-3;
+    color: $color-player-3;
+  }
+
+  &.player-4 {
+    border-color: $color-player-4;
+    color: $color-player-4;
+  }
+
+  &.player-5 {
+    border-color: $color-player-5;
+    color: $color-player-5;
+  }
+
+  &.player-6 {
+    border-color: $color-player-6;
+    color: $color-player-6;
+  }
 }

@@ -111,8 +111,8 @@
         height: 100%;
 
         .link {
-          stroke: red;
-          stroke-width: .1px;
+          stroke: $color-unclaimed;
+          stroke-width: .2px;
         }
       }
     }
