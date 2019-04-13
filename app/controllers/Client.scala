@@ -129,6 +129,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       case "proceedWithTurn" => {
         proceedWithTurn()
       }
+      case "attack" => {
+        val (attackingTerritoryId, enemyTerritoryId) = typedTuple[String, String](args)
+        attack(attackingTerritoryId, enemyTerritoryId)
+      }
     }
   }
 
