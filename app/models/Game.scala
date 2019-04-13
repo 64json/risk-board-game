@@ -1,7 +1,10 @@
 package models
 
+import java.util
+
 import controllers.Client
 import models.interface.{Identifiable, Receivable}
+import play.api.libs.json.{JsArray, JsValue, Json}
 
 import scala.util.Random
 
@@ -90,7 +93,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   }
 
   def proceedWithTurn(): Unit = {
-    if (players(turnIndex.get).assignedArmies > 0) throw new Error(s"All the armies should be assigned before proceeding with turn.")
+    //if (players(turnIndex.get).assignedArmies > 0) throw new Error(s"All the armies should be assigned before proceeding with turn.") TODO: Error should only occur at beginning of players turn.
     turnIndex = Some((turnIndex.get + 1) % players.length)
     giveArmies()
   }
@@ -108,6 +111,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     player.assignedArmies = player.assignedArmies + Math.max(3, totalTerritoryCount / 3)
   }
 
+
   def attack(attackingTerritoryId: String, enemyTerritoryId: String): Unit = {
     val player = players(turnIndex.get)
     val attackingTerritory = continents.get.foreach(continent => {
@@ -122,6 +126,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
         }
       })
     })
+  }
 
     val enemyTerritory = continents.get.foreach(continent => {
       val continentTerritories = continent.territories
@@ -138,6 +143,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
       })
     })
   }
+
 
   def destroy(): Unit = onDestroy(this)
 }

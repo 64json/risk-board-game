@@ -129,9 +129,16 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       case "proceedWithTurn" => {
         proceedWithTurn()
       }
+
       case "attack" => {
         val (attackingTerritoryId, enemyTerritoryId) = typedTuple[String, String](args)
         attack(attackingTerritoryId, enemyTerritoryId)
+      }
+
+      case "compareDice" => {
+        val (diceA, diceB) = typedTuple[Int,Int](args)
+        compareDice(diceA,diceB);
+
       }
     }
   }
@@ -262,11 +269,26 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     )
   }
 
+
   def attack(attackingTerritoryId: String, enemyTerritoryId: String): Unit = {
     val game = getGame()
     val player = game.players(game.turnIndex.get)
     if (player.client != this) throw new Error(s"This is not ${player.name}'s turn.")
 
     game.attack(attackingTerritoryId, enemyTerritoryId)
+  }
+
+  def compareDice(diceA: Int, diceB: Int): Unit = {
+    val game = getGame()
+    game.compareDice(diceA,diceB)
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "assignedArmies"
+        )
+      )
+    )
+  }
+
   }
 }
