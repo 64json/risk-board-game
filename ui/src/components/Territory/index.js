@@ -24,7 +24,6 @@ class Territory extends Component {
     this.setState({armies: ''});
   };
 
-
   render() {
     const {territory} = this.props;
     const {armies} = this.state;
@@ -42,6 +41,9 @@ class Territory extends Component {
 
 
         {territory.name} ({territory.owner ? `${game.players.find(player => player.id === territory.owner).name}: ${territory.armies} Armies` : `Not Claimed`})
+
+
+
       </div>
     );
   }

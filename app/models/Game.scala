@@ -112,5 +112,38 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   }
 
 
+  def attack(attackingTerritoryId: String, enemyTerritoryId: String): Unit = {
+    val player = players(turnIndex.get)
+    val attackingTerritory = continents.get.foreach(continent => {
+      val continentTerritories = continent.territories
+      continentTerritories.foreach(territory => {
+        if (territory.name == attackingTerritoryId) {
+          if (territory.owner == Some && territory.owner != player) {
+            throw new Error("You cannot attack from a territory you don't own")
+          } else {
+            territory
+          }
+        }
+      })
+    })
+  }
+
+    val enemyTerritory = continents.get.foreach(continent => {
+      val continentTerritories = continent.territories
+      continentTerritories.foreach(territory => {
+        if (territory.name == enemyTerritoryId) {
+          if (territory.owner == Some && territory.owner == player) {
+            throw new Error("You cannot attack a territory you own")
+          } else if (!(territory.adjacencyTerritories.contains(attackingTerritory))) {
+            throw new Error("You cannot attack a non-adjacent territory")
+          } else {
+            territory
+          }
+        }
+      })
+    })
+  }
+
+
   def destroy(): Unit = onDestroy(this)
 }

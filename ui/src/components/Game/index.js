@@ -35,6 +35,24 @@ class Game extends Component {
     server.proceedWithTurn();
   };
 
+  handleAttack = () => {
+    let attackingTerritory;
+    let attackingTerritoryName = prompt("Which territory do you want to attack from?", "Name of Territory")
+    if (attackingTerritoryName === null || attackingTerritoryName === "") {
+      attackingTerritory = "Player did not enter a valid territory name"
+    }
+    else attackingTerritory = attackingTerritoryName
+
+    let enemyTerritory;
+    let enemyTerritoryName = prompt("Which territory do you want to attack?", "Name of Enemy Territory")
+    if (enemyTerritoryName === null || enemyTerritoryName === "") {
+      enemyTerritory = "Player did not enter a valid territory name"
+    }
+    else enemyTerritory = enemyTerritoryName
+
+    server.attack(attackingTerritory, enemyTerritory);
+  };
+
   render() {
     const {game, player} = server;
     console.log(server);
@@ -85,13 +103,20 @@ class Game extends Component {
             game.playing &&
             <button onClick={this.handleProceedWithTurn}
                     disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
-              Proceed With Turn
+              Pass Turn to Next Player
             </button>
           }
-          <button onClick={this.handleLeaveGame}>
-            Leave
-          </button>
+          {
+            game.playing &&
+            <button onClick={this.handleAttack}
+                    disabled={playerOnMove.id !== player || playerOnMove.assignedArmies > 0}>
+              Attack
+            </button>
+          }
         </div>
+        <button onClick={this.handleLeaveGame}>
+          Leave
+        </button>
         <hr/>
         {
           game.playing &&

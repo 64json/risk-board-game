@@ -96,6 +96,10 @@ class Server {
   proceedWithTurn() {
     this.send('proceedWithTurn', []);
   }
+
+  attack(attackingTerritoryId, enemyTerritoryId) {
+    this.send('attack', [attackingTerritoryId, enemyTerritoryId]);
+  }
 }
 
 const server = new Server();
