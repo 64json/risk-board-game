@@ -51,6 +51,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     if (playing) {
       continents.get.foreach(_.territories.foreach(territory => {
         if (territory.owner.contains(player)) {
+          // TODO: donate the territory to its neighbors?
           territory.reset()
         }
       }))
@@ -66,12 +67,10 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
 
     playing = true
     val assignedArmies = 20 + (6 - players.length) * 5
-    players.foreach(player => {
-      player.assignedArmies = assignedArmies
-      player.assigning = true
-    })
+    players.foreach(_.assignedArmies = assignedArmies)
     players = Random.shuffle(players)
-    turnIndex = None
+    turnIndex = Some(0)
+    players(turnIndex.get).allotting = true
     continents = Some(Continent.createContinents)
   }
 
@@ -80,6 +79,21 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   def getTerritories = continents.get.flatMap(_.territories)
 
   def findTerritory(territoryId: String): Option[Territory] = getTerritories.find(_.id == territoryId)
+
+  def allotArmy(player: Player, territory: Territory): Unit = {
+    if (territory.owner.isDefined) throw new Error("The territory is already occupied.")
+    territory.owner = Some(player)
+    territory.armies = 1
+    player.assignedArmies -= 1
+    player.allotting = false
+    if (getTerritories.forall(_.owner.isDefined)) {
+      players.foreach(_.assigning = true)
+      turnIndex = None
+    } else {
+      turnIndex = Some((turnIndex.get + 1) % players.length)
+      players(turnIndex.get).allotting = true
+    }
+  }
 
   def assignArmies(player: Player, territory: Territory, armies: Int): Unit = {
     if (armies < 1) throw new Error("You need to assign at least one dude.")

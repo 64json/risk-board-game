@@ -32,6 +32,10 @@ class Game extends Component {
     socket.endFortify();
   };
 
+  handleAllotArmy = territory => {
+    socket.allotArmy(territory.id);
+  };
+
   handleAssignArmies = territory => {
     this.props.prompt('Enter the number of armies to assign: ', armies => {
       socket.assignArmies(territory.id, Number(armies) | 0);
@@ -69,7 +73,12 @@ class Game extends Component {
       };
     } else {
       const me = game.players.find(p => p.id === player);
-      if (me.assigning) {
+      if (me.allotting) {
+        return {
+          text: 'Choose an unoccupied territory to allot an army to',
+          onClick: this.handleAllotArmy,
+        };
+      } else if (me.assigning) {
         return {
           text: 'Choose your territory to assign your armies to.',
           onClick: this.handleAssignArmies,
@@ -78,7 +87,7 @@ class Game extends Component {
         const {fromTerritoryId} = this.state;
         if (!fromTerritoryId) {
           return {
-            text: 'Choose your territory to attack with.',
+            text: 'Choose your territory to attack from.',
             onClick: this.handleClickFromTerritory,
           };
         } else {
@@ -118,7 +127,7 @@ class Game extends Component {
           }
         }
         return {
-          text: `${currentPlayer.name} is ${currentPlayer.assigning ? 'assign' : currentPlayer.attacking ? 'attack' : currentPlayer.fortifying ? 'fortify' : 'doing someth'}ing.`,
+          text: `${currentPlayer.name} is ${currentPlayer.allotting ? 'allott' : currentPlayer.assigning ? 'assign' : currentPlayer.attacking ? 'attack' : currentPlayer.fortifying ? 'fortify' : 'doing someth'}ing.`,
         };
       }
     }

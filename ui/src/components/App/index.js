@@ -14,7 +14,6 @@ class App extends Component {
     };
   }
 
-
   componentDidMount() {
     socket.open(this.props.updateData);
   }

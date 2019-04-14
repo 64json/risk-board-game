@@ -31,6 +31,7 @@ class Attack(val fromTerritory: Territory, val toTerritory: Territory, val attac
       rolledDiceCount += 1
     }
     if (toTerritory.armies == 0) {
+      // TODO: how many armies to move?
       val survivedArmies = attackingDiceCount - rolledDiceCount
       toTerritory.owner = fromTerritory.owner
       fromTerritory.armies -= survivedArmies

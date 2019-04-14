@@ -123,6 +123,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       case "startGame" =>
         startGame()
 
+      case "allotArmy" =>
+        val territoryId = typed[String](args)
+        allotArmy(territoryId)
+
       case "assignArmies" =>
         val (territoryId, armies) = typedTuple[String, Int](args)
         assignArmies(territoryId, armies)
@@ -220,6 +224,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "playing",
         "players" -> List(
           "assignedArmies",
+          "allotting",
           "assigning",
           "attacking",
           "fortifying",
@@ -238,10 +243,34 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     )
   }
 
+  def allotArmy(territoryId: String): Unit = {
+    val game = getGame()
+    val territory = getTerritory(territoryId)
+    if (!player.get.allotting) throw new Error("This is not your turn.")
+    game.allotArmy(player.get, territory)
+
+    game.send(
+      "game" -> List(
+        "players" -> List(
+          "assignedArmies",
+          "allotting",
+          "assigning",
+        ),
+        "turnIndex",
+        "continents" -> List(
+          "territories" -> List(
+            "owner",
+            "armies"
+          )
+        )
+      )
+    )
+  }
+
   def assignArmies(territoryId: String, armies: Int): Unit = {
     val game = getGame()
     val territory = getTerritory(territoryId)
-    if (!player.get.assigning) throw new Error("This is not your turn.");
+    if (!player.get.assigning) throw new Error("This is not your turn.")
     game.assignArmies(player.get, territory, armies)
 
     game.send(

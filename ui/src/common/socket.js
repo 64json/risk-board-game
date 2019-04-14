@@ -84,6 +84,10 @@ class Socket {
     this.send('leaveGame', []);
   }
 
+  allotArmy(territoryId) {
+    this.send('allotArmy', [territoryId]);
+  }
+
   assignArmies(territoryId, armies) {
     this.send('assignArmies', [territoryId, armies]);
   }
