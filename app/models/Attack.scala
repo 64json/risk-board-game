@@ -10,7 +10,7 @@ class Attack(val fromTerritory: Territory, val toTerritory: Territory, val attac
   var defendingDice: Option[String] = None
   var done: Boolean = false
 
-  def defend(defendingDiceCount: Int) = {
+  def defend(defendingDiceCount: Int): Unit = {
     this.defendingDiceCount = Some(defendingDiceCount)
     val attackingDice = Seq.fill(attackingDiceCount)(Random.nextInt(6) + 1)
     val defendingDice = Seq.fill(defendingDiceCount)(Random.nextInt(6) + 1)
@@ -40,7 +40,7 @@ class Attack(val fromTerritory: Territory, val toTerritory: Territory, val attac
     done = true
   }
 
-  override def fields = Map(
+  override def fields: Map[String, Any] = Map(
     "id" -> id,
     "fromTerritory" -> fromTerritory,
     "toTerritory" -> toTerritory,
@@ -48,6 +48,6 @@ class Attack(val fromTerritory: Territory, val toTerritory: Territory, val attac
     "defendingDiceCount" -> defendingDiceCount,
     "attackingDice" -> attackingDice,
     "defendingDice" -> defendingDice,
-    "done" -> done,
+    "done" -> done
   )
 }

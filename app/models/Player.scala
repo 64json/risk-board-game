@@ -10,14 +10,14 @@ class Player(val name: String, val client: Client) extends Identifiable with Rec
   var attacking: Boolean = false
   var fortifying: Boolean = false
 
-  override def fields = Map(
+  override def fields: Map[String, Any] = Map(
     "id" -> id,
     "name" -> name,
     "assignedArmies" -> assignedArmies,
     "allotting" -> allotting,
     "assigning" -> assigning,
     "attacking" -> attacking,
-    "fortifying" -> fortifying,
+    "fortifying" -> fortifying
   )
 
   override def receivers: List[Client] = List(client)

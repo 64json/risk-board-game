@@ -17,11 +17,11 @@ class Territory(val name: String) extends Identifiable {
     armies = 0
   }
 
-  override def fields = Map(
+  override def fields: Map[String, Any] = Map(
     "id" -> id,
     "name" -> name,
     "adjacencyTerritories" -> adjacencyTerritories,
     "owner" -> owner,
-    "armies" -> armies,
+    "armies" -> armies
   )
 }

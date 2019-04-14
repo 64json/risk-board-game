@@ -13,7 +13,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   var continents: Option[List[Continent]] = None
   var attack: Option[Attack] = None
 
-  override def fields = Map(
+  override def fields: Map[String, Any] = Map(
     "id" -> id,
     "name" -> name,
     "playing" -> playing,
@@ -21,7 +21,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     "owner" -> owner,
     "turnIndex" -> turnIndex,
     "continents" -> continents,
-    "attack" -> attack,
+    "attack" -> attack
   )
 
   override def receivers: List[Client] = players.map(_.client)
@@ -43,20 +43,20 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     players = players.filter(_ != player)
     if (players.isEmpty) {
       destroy()
-      return
-    }
-    if (owner == player) {
-      owner = players.head
-    }
-    if (playing) {
-      continents.get.foreach(_.territories.foreach(territory => {
-        if (territory.owner.contains(player)) {
-          // TODO: donate the territory to its neighbors?
-          territory.reset()
+    } else {
+      if (owner == player) {
+        owner = players.head
+      }
+      if (playing) {
+        continents.get.foreach(_.territories.foreach(territory => {
+          if (territory.owner.contains(player)) {
+            // TODO: donate the territory to its neighbors?
+            territory.reset()
+          }
+        }))
+        if (players.length == 1) {
+          // TODO: the only player wins the game
         }
-      }))
-      if (players.length == 1) {
-        // TODO: the only player wins the game
       }
     }
   }
@@ -76,7 +76,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
 
   def getContinents: Option[List[Continent]] = continents
 
-  def getTerritories = continents.get.flatMap(_.territories)
+  def getTerritories: List[Territory] = continents.get.flatMap(_.territories)
 
   def findTerritory(territoryId: String): Option[Territory] = getTerritories.find(_.id == territoryId)
 

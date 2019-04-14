@@ -11,7 +11,8 @@ import play.api.mvc.WebSocket.MessageFlowTransformer
 import play.api.mvc._
 
 @Singleton
-class Application @Inject()(assets: Assets, errorHandler: HttpErrorHandler, config: Configuration, cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
+class Application @Inject()(assets: Assets, errorHandler: HttpErrorHandler, config: Configuration, cc: ControllerComponents)
+                           (implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
   def index: Action[AnyContent] = assets.at("index.html")
 
   /*
@@ -31,7 +32,7 @@ class Application @Inject()(assets: Assets, errorHandler: HttpErrorHandler, conf
    creates a web socket server
    what is web socket? https://www.maxcdn.com/one/visual-glossary/websocket/
     */
-  def ws = WebSocket.accept[JsValue, JsValue] { request =>
+  def ws: WebSocket = WebSocket.accept[JsValue, JsValue] { request =>
     ActorFlow.actorRef { out =>
       Client.props(out)
     }

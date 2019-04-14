@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 
 object Client extends Receivable {
   // creates an SocketActor object for each client
-  def props(actorRef: ActorRef) = Props(new Client(actorRef))
+  def props(actorRef: ActorRef): Props = Props(new Client(actorRef))
 
   case class Action(method: String, args: List[JsValue])
 
@@ -63,7 +63,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     "games" -> Client.games,
     "game" -> game,
     "player" -> player,
-    "error" -> error,
+    "error" -> error
   )
 
   override def receivers: List[Client] = List(this)
@@ -86,10 +86,9 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
 
   def getTerritory(territoryId: String): Territory = {
     val game = getGame()
-    game.continents.get.foreach(_.territories.foreach(territory => {
-      if (territory.id == territoryId) return territory
-    }))
-    throw new Error("The territory is not found.")
+    val territory: Option[Territory] = game.getTerritories.find(_.id == territoryId)
+    if (territory.isEmpty) throw new Error("The territory is not found.")
+    territory.get
   }
 
   // processes message received from client
@@ -227,7 +226,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "allotting",
           "assigning",
           "attacking",
-          "fortifying",
+          "fortifying"
         ),
         "turnIndex",
         "continents" -> List(
@@ -254,7 +253,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "players" -> List(
           "assignedArmies",
           "allotting",
-          "assigning",
+          "assigning"
         ),
         "turnIndex",
         "continents" -> List(
@@ -278,7 +277,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "players" -> List(
           "assignedArmies",
           "assigning",
-          "attacking",
+          "attacking"
         ),
         "turnIndex",
         "continents" -> List(
@@ -311,7 +310,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "defendingDiceCount",
           "attackingDice",
           "defendingDice",
-          "done",
+          "done"
         )
       )
     )
@@ -327,7 +326,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       "game" -> List(
         "players" -> List(
           "attacking",
-          "fortifying",
+          "fortifying"
         ),
         "continents" -> List(
           "territories" -> List(
@@ -339,7 +338,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "defendingDiceCount",
           "attackingDice",
           "defendingDice",
-          "done",
+          "done"
         )
       )
     )
@@ -353,8 +352,8 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       "game" -> List(
         "players" -> List(
           "attacking",
-          "fortifying",
-        ),
+          "fortifying"
+        )
       )
     )
   }
@@ -375,14 +374,14 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "players" -> List(
           "assignedArmies",
           "assigning",
-          "fortifying",
+          "fortifying"
         ),
         "turnIndex",
         "continents" -> List(
           "territories" -> List(
             "armies"
           )
-        ),
+        )
       )
     )
   }
@@ -396,9 +395,9 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         "players" -> List(
           "assignedArmies",
           "assigning",
-          "fortifying",
+          "fortifying"
         ),
-        "turnIndex",
+        "turnIndex"
       )
     )
   }
