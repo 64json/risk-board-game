@@ -62,7 +62,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   }
 
   def start(): Unit = {
-    if (players.length < 3) throw new Error("Not enough players.")
+    // if (players.length < 3) throw new Error("Not enough players.")
     if (players.length > 6) throw new Error("Too many players.")
 
     playing = true

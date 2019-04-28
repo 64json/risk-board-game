@@ -4,7 +4,6 @@ import socket from '../../common/socket';
 import {classes} from '../../common/utils';
 import {Territory} from '../../components';
 import {actions} from '../../reducers';
-import coords from './coords';
 import './stylesheet.scss';
 
 class Game extends Component {
@@ -146,8 +145,8 @@ class Game extends Component {
       territories.forEach(territory => {
         territory.adjacencyTerritories.forEach(adjacencyTerritory => {
           const link = {
-            from: territories.indexOf(territory),
-            to: territories.findIndex(t => t.id === adjacencyTerritory),
+            from: territory,
+            to: territories.find(territory => territory.id === adjacencyTerritory),
           };
           if (!links.find(l => l.from === link.to && l.to === link.from)) {
             links.push(link);
@@ -225,19 +224,16 @@ class Game extends Component {
                      className="svg">
                   {
                     links.map(({from, to}) => {
-                      const {x: fromX, y: fromY} = coords[from];
-                      const {x: toX, y: toY} = coords[to];
                       return (
-                        <line className="link" key={from + ' ' + to}
-                              x1={fromX * 80} y1={fromY * 50}
-                              x2={toX * 80} y2={toY * 50}/>
+                        <line className="link" key={from.id + '-' + to.id}
+                              x1={from.x * 80} y1={from.y * 50}
+                              x2={to.x * 80} y2={to.y * 50}/>
                       );
                     })
                   }
                 </svg>
                 {
-                  territories.map((territory, i) => {
-                    const {x, y} = coords[i];
+                  territories.map(territory => {
                     const playerIndex = game.players.findIndex(p => p.id === territory.owner);
                     return (
                       <Territory
@@ -245,8 +241,8 @@ class Game extends Component {
                         key={territory.id} territory={territory}
                         onClick={instruction.onClick}
                         style={{
-                          top: `${(y * 100).toFixed(2)}%`,
-                          left: `${(x * 100).toFixed(2)}%`,
+                          top: `${(territory.y * 100).toFixed(2)}%`,
+                          left: `${(territory.x * 100).toFixed(2)}%`,
                         }}/>
                     );
                   })

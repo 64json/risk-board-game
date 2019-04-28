@@ -53,6 +53,8 @@ trait Formattable {
             case Some(v: Boolean) => Json.toJson(v)
             case v: Int => Json.toJson(v)
             case Some(v: Int) => Json.toJson(v)
+            case v: Double => Json.toJson(v)
+            case Some(v: Double) => Json.toJson(v)
 
             case _ => throw new Error("The type cannot be serialized.")
           }
