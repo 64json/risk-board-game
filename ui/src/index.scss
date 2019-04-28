@@ -15,4 +15,34 @@ body {
   &:before {
     white-space: pre;
   }
+
+  &.player-1 {
+    border-color: $color-player-1;
+    color: $color-player-1;
+  }
+
+  &.player-2 {
+    border-color: $color-player-2;
+    color: $color-player-2;
+  }
+
+  &.player-3 {
+    border-color: $color-player-3;
+    color: $color-player-3;
+  }
+
+  &.player-4 {
+    border-color: $color-player-4;
+    color: $color-player-4;
+  }
+
+  &.player-5 {
+    border-color: $color-player-5;
+    color: $color-player-5;
+  }
+
+  &.player-6 {
+    border-color: $color-player-6;
+    color: $color-player-6;
+  }
 }

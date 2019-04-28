@@ -12,6 +12,8 @@ class Game extends Component {
 
     this.state = {
       fromTerritoryId: null,
+      toTerritoryId: null,
+      showingAttackId: null,
     };
   }
 
@@ -49,19 +51,31 @@ class Game extends Component {
   handleAttack = territory => {
     const {fromTerritoryId} = this.state;
     const toTerritoryId = territory.id;
-    this.props.prompt('Enter the number of attacking dice to roll: ', attackingDiceCount => {
-      socket.createAttack(fromTerritoryId, toTerritoryId, Number(attackingDiceCount) | 0);
+    if (fromTerritoryId === toTerritoryId) {
       this.setState({fromTerritoryId: null});
-    });
+    } else {
+      this.setState({toTerritoryId});
+      this.props.prompt('Enter the number of attacking dice to roll: ', attackingDiceCount => {
+        socket.createAttack(fromTerritoryId, toTerritoryId, Number(attackingDiceCount) | 0);
+      }, null, () => {
+        this.setState({fromTerritoryId: null, toTerritoryId: null});
+      });
+    }
   };
 
   handleFortify = territory => {
     const {fromTerritoryId} = this.state;
     const toTerritoryId = territory.id;
-    this.props.prompt('Enter the number of armies to move: ', armies => {
-      socket.fortify(fromTerritoryId, toTerritoryId, Number(armies) | 0);
+    if (fromTerritoryId === toTerritoryId) {
       this.setState({fromTerritoryId: null});
-    });
+    } else {
+      this.setState({toTerritoryId});
+      this.props.prompt('Enter the number of armies to move: ', armies => {
+        socket.fortify(fromTerritoryId, toTerritoryId, Number(armies) | 0);
+      }, null, () => {
+        this.setState({fromTerritoryId: null, toTerritoryId: null});
+      });
+    }
   };
 
   getInstruction = () => {
@@ -75,37 +89,59 @@ class Game extends Component {
       if (me.allotting) {
         return {
           text: 'Choose an unoccupied territory to allot an army to',
+          isEnabled: territory => !territory.owner,
           onClick: this.handleAllotArmy,
         };
       } else if (me.assigning) {
         return {
           text: 'Choose your territory to assign your armies to.',
+          isEnabled: territory => territory.owner === me.id,
           onClick: this.handleAssignArmies,
         };
       } else if (me.attacking) {
-        const {fromTerritoryId} = this.state;
-        if (!fromTerritoryId) {
+        if (game.attack && !game.attack.done) {
           return {
-            text: 'Choose your territory to attack from.',
-            onClick: this.handleClickFromTerritory,
+            text: 'Waiting for response from the defender ...',
           };
         } else {
-          return {
-            text: 'Choose the territory to attack.',
-            onClick: this.handleAttack,
-          };
+          const {fromTerritoryId, toTerritoryId} = this.state;
+          if (!fromTerritoryId) {
+            return {
+              text: 'Choose your territory to attack from.',
+              isEnabled: territory => territory.owner === me.id,
+              onClick: this.handleClickFromTerritory,
+            };
+          } else if (!toTerritoryId) {
+            const territories = game.continents.flatMap(continent => continent.territories);
+            return {
+              text: 'Choose the territory to attack.',
+              isEnabled: territory => territory.owner !== me.id && territories.find(territory => territory.id === fromTerritoryId).adjacencyTerritories.includes(territory.id),
+              onClick: this.handleAttack,
+            };
+          } else {
+            return {
+              text: 'You are attacking.',
+            };
+          }
         }
       } else if (me.fortifying) {
-        const {fromTerritoryId} = this.state;
+        const {fromTerritoryId, toTerritoryId} = this.state;
         if (!fromTerritoryId) {
           return {
             text: 'Choose your territory to move armies from.',
+            isEnabled: territory => territory.owner === me.id,
             onClick: this.handleClickFromTerritory,
+          };
+        } else if(!toTerritoryId) {
+          const territories = game.continents.flatMap(continent => continent.territories);
+          return {
+            text: 'Choose your territory to move armies to.',
+            isEnabled: territory => territory.owner === me.id && territories.find(territory => territory.id === fromTerritoryId).adjacencyTerritories.includes(territory.id),
+            onClick: this.handleFortify,
           };
         } else {
           return {
-            text: 'Choose your territory to move armies to.',
-            onClick: this.handleFortify,
+            text: 'You are fortifying.',
           };
         }
       } else if (game.turnIndex === null) {
@@ -132,8 +168,90 @@ class Game extends Component {
     }
   };
 
+  componentWillReceiveProps(nextProps) {
+    const {game} = nextProps.server;
+    const attackId = game.attack && game.attack.id;
+    if (this.state.showingAttackId !== attackId) {
+      this.setState({showingAttackId: attackId});
+    }
+  }
+
+  renderAttack() {
+    const {game} = this.props.server;
+    const territories = game.continents.flatMap(continent => continent.territories);
+    const fromTerritory = territories.find(territory => territory.id === game.attack.fromTerritory);
+    const toTerritory = territories.find(territory => territory.id === game.attack.toTerritory);
+    const attacker = game.players.find(player => player.id === fromTerritory.owner);
+    const defender = game.players.find(player => player.id === toTerritory.owner);
+    const attackerIndex = game.players.findIndex(p => p.id === attacker.id);
+    const defenderIndex = game.players.findIndex(p => p.id === defender.id);
+    const attackingDice = game.attack.attackingDice.split('').map(die => ({
+      value: Number(die),
+      win: false,
+      lose: false,
+    }));
+    const defendingDice = game.attack.defendingDice.split('').map(die => ({
+      value: Number(die),
+      win: false,
+      lose: false,
+    }));
+    const sortedAttackingDice = [...attackingDice].sort((a, b) => b.value - a.value);
+    const sortedDefendingDice = [...defendingDice].sort((a, b) => b.value - a.value);
+    const minDiceCount = Math.min(attackingDice.length, defendingDice.length);
+    let rolledDiceCount = 0;
+    while (rolledDiceCount < minDiceCount && toTerritory.armies > 0) {
+      const attackingDie = sortedAttackingDice[rolledDiceCount];
+      const defendingDie = sortedDefendingDice[rolledDiceCount];
+      if (attackingDie.value > defendingDie.value) {
+        attackingDie.win = true;
+        attackingDie.order = rolledDiceCount;
+        defendingDie.lose = true;
+        defendingDie.order = rolledDiceCount;
+      } else {
+        attackingDie.lose = true;
+        attackingDie.order = rolledDiceCount;
+        defendingDie.win = true;
+        defendingDie.order = rolledDiceCount;
+      }
+      rolledDiceCount += 1;
+    }
+    return (
+      <div className="attack">
+        <div
+          className={classes('player', 'attacker', `player-${attackerIndex + 1}`)}>
+          <span className="name">{attacker.name}</span>
+          <div className="dice">
+            {
+              attackingDice.map((die, i) => (
+                <div key={i}
+                     className={classes('die', die.win && 'win', die.lose && 'lose', `order-${die.order + 1}`)}>
+                  {die.value}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div
+          className={classes('player', 'defender', `player-${defenderIndex + 1}`)}>
+          <span className="name">{defender.name}</span>
+          <div className="dice">
+            {
+              defendingDice.map((die, i) => (
+                <div key={i}
+                     className={classes('die', die.win && 'win', die.lose && 'lose', `order-${die.order + 1}`)}>
+                  {die.value}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const {game, player} = this.props.server;
+    const {fromTerritoryId, toTerritoryId, showingAttackId} = this.state;
     const instruction = this.getInstruction();
 
     let currentPlayer = game.players[game.turnIndex];
@@ -200,7 +318,7 @@ class Game extends Component {
               </button>
             }
             {
-              currentPlayer && currentPlayer.id === player && currentPlayer.attacking &&
+              currentPlayer && currentPlayer.id === player && currentPlayer.attacking && !game.attack &&
               <button onClick={this.handleEndAttack}>
                 End Attack
               </button>
@@ -233,23 +351,28 @@ class Game extends Component {
                   }
                 </svg>
                 {
-                  territories.map(territory => {
-                    const playerIndex = game.players.findIndex(p => p.id === territory.owner);
-                    return (
-                      <Territory
-                        className={territory.owner && `player-${playerIndex + 1}`}
-                        key={territory.id} territory={territory}
-                        onClick={instruction.onClick}
-                        style={{
-                          top: `${(territory.y * 100).toFixed(2)}%`,
-                          left: `${(territory.x * 100).toFixed(2)}%`,
-                        }}/>
-                    );
-                  })
+                  territories.map(territory => (
+                    <Territory
+                      key={territory.id} territory={territory}
+                      from={territory.id === fromTerritoryId || game.attack && game.attack.fromTerritory === territory.id}
+                      to={territory.id === toTerritoryId || game.attack && game.attack.toTerritory === territory.id}
+                      onClick={instruction.onClick}
+                      enabled={instruction.isEnabled && instruction.isEnabled(territory)}
+                      style={{
+                        top: `${(territory.y * 100).toFixed(2)}%`,
+                        left: `${(territory.x * 100).toFixed(2)}%`,
+                      }}/>
+                  ))
                 }
               </div>
             )
           }
+          <div className="attackContainer">
+            {
+              game.attack && game.attack.done && game.attack.id === showingAttackId &&
+              this.renderAttack()
+            }
+          </div>
         </div>
       </div>
     );

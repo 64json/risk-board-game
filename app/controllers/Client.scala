@@ -2,7 +2,7 @@ package controllers
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import common.Utils._
-import controllers.Client.Action
+import controllers.Client.{Action, system}
 import models.interface.{Identifiable, Receivable}
 import models.{Game, Player, Territory}
 import play.api.libs.functional.syntax._
@@ -328,16 +328,6 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
 
     game.send(
       "game" -> List(
-        "players" -> List(
-          "attacking",
-          "fortifying"
-        ),
-        "continents" -> List(
-          "territories" -> List(
-            "owner",
-            "armies"
-          )
-        ),
         "attack" -> List(
           "defendingDiceCount",
           "attackingDice",
@@ -346,6 +336,24 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
         )
       )
     )
+    system.scheduler.scheduleOnce(3 seconds) {
+      game.attack = None
+      game.send(
+        "game" -> List(
+          "players" -> List(
+            "attacking",
+            "fortifying"
+          ),
+          "continents" -> List(
+            "territories" -> List(
+              "owner",
+              "armies"
+            )
+          ),
+          "attack",
+        )
+      )
+    }
   }
 
   def endAttack(): Unit = {

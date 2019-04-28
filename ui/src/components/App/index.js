@@ -30,13 +30,18 @@ class App extends Component {
   handleSubmitAnswer = e => {
     e.preventDefault();
 
-    const {onAnswer} = this.props.dialog;
+    const {onAnswer, onClose} = this.props.dialog;
     const {answer} = this.state;
-    onAnswer(answer);
-    this.handleCloseDialog();
+    if (onAnswer) onAnswer(answer);
+    if (onClose) onClose();
+    this.setState({answer: ''});
+    this.props.prompt(null, null);
   };
 
-  handleCloseDialog = e => {
+  handleCancelDialog = e => {
+    const {onCancel, onClose} = this.props.dialog;
+    if (onCancel) onCancel();
+    if (onClose) onClose();
     this.setState({answer: ''});
     this.props.prompt(null, null);
   };
@@ -55,21 +60,24 @@ class App extends Component {
               <Lobby/>
           )
         }
-        {
-          question &&
-          <form className="dialog" onSubmit={this.handleSubmitAnswer}>
-            <div className="question">
-              {question}
-            </div>
-            <input className="answer" type="text" autoFocus value={answer}
-                   onChange={this.handleChangeAnswer}/>
-            <div className="buttons">
-              <button>Submit</button>
-              <button type="button" onClick={this.handleCloseDialog}>Cancel
-              </button>
-            </div>
-          </form>
-        }
+        <div className="dialogContainer">
+          {
+            question &&
+            <form className="dialog" onSubmit={this.handleSubmitAnswer}>
+              <div className="question">
+                {question}
+              </div>
+              <input className="answer" type="text" autoFocus value={answer}
+                     onChange={this.handleChangeAnswer}/>
+              <div className="buttons">
+                <button>Submit</button>
+                <button type="button" onClick={this.handleCancelDialog}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          }
+        </div>
       </div>
     );
   }

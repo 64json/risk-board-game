@@ -17,6 +17,7 @@
   text-align: center;
   background-color: white;
   font-size: .64vw;
+  transition: all .2s;
 
   .flag {
     width: 2.4em;
@@ -37,33 +38,21 @@
 
   }
 
-  &.player-1 {
-    border-color: $color-player-1;
-    color: $color-player-1;
+  &.from,
+  &.to {
+    transform: scale(1.2);
+    box-shadow: 0 0 1em .1em;
   }
 
-  &.player-2 {
-    border-color: $color-player-2;
-    color: $color-player-2;
+  &.from {
+    z-index: 2;
   }
 
-  &.player-3 {
-    border-color: $color-player-3;
-    color: $color-player-3;
+  &.to {
+    z-index: 1;
   }
 
-  &.player-4 {
-    border-color: $color-player-4;
-    color: $color-player-4;
-  }
-
-  &.player-5 {
-    border-color: $color-player-5;
-    color: $color-player-5;
-  }
-
-  &.player-6 {
-    border-color: $color-player-6;
-    color: $color-player-6;
+  &.enabled {
+    box-shadow: 0 0 1em .1em;
   }
 }

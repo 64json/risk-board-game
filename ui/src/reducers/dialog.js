@@ -2,9 +2,11 @@ import {combineActions, createAction, handleActions} from 'redux-actions';
 
 const prefix = 'DIALOG';
 
-const prompt = createAction(`${prefix}/PROMPT`, (question, onAnswer) => ({
+const prompt = createAction(`${prefix}/PROMPT`, (question, onAnswer, onCancel, onClose) => ({
   question,
   onAnswer,
+  onCancel,
+  onClose,
 }));
 
 const defaultState = {

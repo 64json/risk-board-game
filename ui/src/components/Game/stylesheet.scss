@@ -5,7 +5,7 @@
   display: flex;
 
   .sidebar {
-    width: 20vw;
+    width: 20rem;
     padding: 1rem;
     display: flex;
     flex-direction: column;
@@ -53,36 +53,6 @@
         &.current {
           border: 2px solid;
         }
-
-        &.player-1 {
-          border-color: $color-player-1;
-          color: $color-player-1;
-        }
-
-        &.player-2 {
-          border-color: $color-player-2;
-          color: $color-player-2;
-        }
-
-        &.player-3 {
-          border-color: $color-player-3;
-          color: $color-player-3;
-        }
-
-        &.player-4 {
-          border-color: $color-player-4;
-          color: $color-player-4;
-        }
-
-        &.player-5 {
-          border-color: $color-player-5;
-          color: $color-player-5;
-        }
-
-        &.player-6 {
-          border-color: $color-player-6;
-          color: $color-player-6;
-        }
       }
     }
 
@@ -97,6 +67,7 @@
     align-items: center;
     justify-content: center;
     background-color: white;
+    position: relative;
 
     .map {
       width: 64vw;
@@ -117,5 +88,134 @@
       }
     }
 
+    .attackContainer {
+      z-index: 3;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(black, .8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+
+      &:empty {
+        background-color: rgba(black, 0);
+        pointer-events: none;
+      }
+
+      .attack {
+        display: flex;
+        flex-direction: column;
+
+        .player {
+          display: flex;
+          align-items: center;
+
+          .name {
+            display: flex;
+            width: 10rem;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: $font-size-large;
+          }
+
+          &.attacker {
+            .name:after {
+              content: ' (Attacker)';
+              font-weight: normal;
+              font-size: $font-size-medium;
+            }
+          }
+
+          &.defender {
+            .name:after {
+              content: ' (Defender)';
+              font-weight: normal;
+              font-size: $font-size-medium;
+            }
+          }
+
+          .dice {
+            display: flex;
+
+            .die {
+              width: 4rem;
+              height: 4rem;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background-color: $color-background;
+              margin: 1rem;
+              font-size: $font-size-large;
+              font-weight: bold;
+              box-shadow: 1px 1px 0px #999,
+              2px 2px 0px #999,
+              3px 3px 0px #999,
+              4px 4px 0px #999,
+              5px 5px 0px #999,
+              6px 6px 0px #999;
+              transition: all .2s;
+
+              @keyframes win {
+                from {
+                  transform: scale(1);
+                  box-shadow: 1px 1px 0px #999,
+                  2px 2px 0px #999,
+                  3px 3px 0px #999,
+                  4px 4px 0px #999,
+                  5px 5px 0px #999,
+                  6px 6px 0px #999,
+                  0 0 0 0;
+                }
+
+                to {
+                  transform: scale(1.2);
+                  box-shadow: 1px 1px 0px #999,
+                  2px 2px 0px #999,
+                  3px 3px 0px #999,
+                  4px 4px 0px #999,
+                  5px 5px 0px #999,
+                  6px 6px 0px #999,
+                  0 0 1em .1em;
+                }
+              }
+
+              @keyframes lose {
+                from {
+                  transform: scale(1);
+                  opacity: 1;
+                }
+
+                to {
+                  transform: scale(.8);
+                  opacity: .2;
+                }
+              }
+
+              &.win {
+                animation: .5s win forwards;
+              }
+
+              &.lose {
+                animation: .5s lose forwards
+              }
+
+              &.order-1 {
+                animation-delay: 1s;
+              }
+
+              &.order-2 {
+                animation-delay: 2s;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
