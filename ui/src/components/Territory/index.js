@@ -24,7 +24,7 @@ class Territory extends Component {
         enabled && 'enabled',
         className,
       )} style={style}
-           onClick={this.handleClick}>
+           onClick={enabled && this.handleClick}>
         <img src={`/flags/${territory.flag}`} className="flag"/>
         <span className="name">
           {territory.name}

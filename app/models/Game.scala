@@ -62,8 +62,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   }
 
   def start(): Unit = {
-    /* TODO: uncomment this line */
-    // if (players.length < 3) throw new Error("Not enough players.")
+    if (players.length < 3) throw new Error("Not enough players.")
     if (players.length > 6) throw new Error("Too many players.")
 
     playing = true
@@ -73,11 +72,12 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     turnIndex = Some(0)
     players(turnIndex.get).allotting = true
     continents = Some(Continent.createContinents)
-    /* TODO: remove below */
+    // /* testing purpose:
     getTerritories.foreach(allotArmy(players(turnIndex.get), _))
     players.foreach(player => assignArmies(player, getTerritories.find(_.owner.contains(player)).get, player.assignedArmies))
     val player = players(turnIndex.get)
     assignArmies(player, getTerritories.find(_.owner.contains(player)).get, player.assignedArmies)
+    // */
   }
 
   def getContinents: Option[List[Continent]] = continents

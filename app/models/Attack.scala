@@ -20,22 +20,23 @@ class Attack(val fromTerritory: Territory, val toTerritory: Territory, val attac
     val sortedDefendingDice = defendingDice.sortWith(_ > _)
     val minDiceCount = Math.min(attackingDiceCount, defendingDiceCount)
     var rolledDiceCount = 0
-    while (rolledDiceCount < minDiceCount && toTerritory.armies > 0) {
+    var survivedAttackingArmies = attackingDiceCount
+    while (rolledDiceCount < minDiceCount) {
       val attackingDie = sortedAttackingDice(rolledDiceCount)
       val defendingDie = sortedDefendingDice(rolledDiceCount)
       if (attackingDie > defendingDie) {
         toTerritory.armies -= 1
       } else {
         fromTerritory.armies -= 1
+        survivedAttackingArmies -= 1
       }
       rolledDiceCount += 1
     }
     if (toTerritory.armies == 0) {
-      // TODO: how many armies to move?
-      val survivedArmies = attackingDiceCount - rolledDiceCount
       toTerritory.owner = fromTerritory.owner
-      fromTerritory.armies -= survivedArmies
-      toTerritory.armies = survivedArmies
+      // TODO: how many armies to move?
+      fromTerritory.armies -= survivedAttackingArmies
+      toTerritory.armies = survivedAttackingArmies
     }
     done = true
   }
