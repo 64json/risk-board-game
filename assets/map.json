@@ -6,38 +6,47 @@
       "territories": [
         {
           "name": "Elsa's Castle",
+          "flag": "elsasnowflake.png",
           "x": 0.156,
           "y": 0.877
         }, {
           "name": "Court of Miracles",
+          "flag": "esmeraldamap.png",
           "x": 0.252,
           "y": 0.996
         }, {
           "name": "London",
+          "flag": "bigben.png",
           "x": 0.767,
           "y": 0.714
         }, {
           "name": "The Bayeux",
+          "flag": "firefly.png",
           "x": 0.676,
           "y": 0.943
         }, {
           "name": "San Fransokyo",
+          "flag": "baymax.png",
           "x": 0.452,
           "y": 0.77
         }, {
           "name": "Arendelle",
+          "flag": "arendellecrest.png",
           "x": 0.316,
           "y": 0.701
         }, {
           "name": "Notre Dame",
+          "flag": "bell.png",
           "x": 0.391,
           "y": 0.899
         }, {
           "name": "Hawaii",
+          "flag": "stitch.png",
           "x": 0.608,
           "y": 0.771
         }, {
           "name": "New Orleans",
+          "flag": "voodootalisman.png",
           "x": 0.52,
           "y": 1
         }
@@ -48,18 +57,22 @@
       "territories": [
         {
           "name": "Yzma's House",
+          "flag": "potionbottle.png",
           "x": 1,
           "y": 0.512
         }, {
           "name": "Kuzco Castle",
+          "flag": "kuzcoshat.png",
           "x": 0.885,
           "y": 0.638
         }, {
           "name": "Pacha's House",
+          "flag": "llamapatch.png",
           "x": 0.999,
           "y": 0.754
         }, {
           "name": "Neverland",
+          "flag": "tinkerbelle.png",
           "x": 0.88,
           "y": 0.872
         }
@@ -70,30 +83,37 @@
       "territories": [
         {
           "name": "Imperial City",
+          "flag": "medal.png",
           "x": 0.656,
           "y": 0.59
         }, {
           "name": "Great Wall of China",
+          "flag": "braizier.png",
           "x": 0.527,
           "y": 0.648
         }, {
           "name": "Mount Olympus",
+          "flag": "mountolympus.png",
           "x": 0.617,
           "y": 0.436
         }, {
           "name": "The Cave of Wonders",
+          "flag": "lamp.png",
           "x": 0.407,
           "y": 0.55
         }, {
           "name": "Athens",
+          "flag": "column.png",
           "x": 0.602,
           "y": 0.259
         }, {
           "name": "Agrabah",
+          "flag": "agrabah.png",
           "x": 0.464,
           "y": 0.404
         }, {
           "name": "The Underworld",
+          "flag": "ghost.png",
           "x": 0.779,
           "y": 0.523
         }
@@ -104,26 +124,32 @@
       "territories": [
         {
           "name": "The Elephant Graveyard",
+          "flag": "elephantskull.png",
           "x": 0.988,
           "y": 0.292
         }, {
           "name": "Beast's Castle",
+          "flag": "rose.png",
           "x": 0.869,
           "y": 0.175
         }, {
           "name": "Timon and Pumba's Hideout",
+          "flag": "grub.png",
           "x": 0.733,
           "y": 0.208
         }, {
           "name": "Belle's Cottage",
+          "flag": "waterwheel.png",
           "x": 0.823,
           "y": 0.015
         }, {
           "name": "The Pridelands",
+          "flag": "priderock.png",
           "x": 0.834,
           "y": 0.374
         }, {
           "name": "Gaston's Tavern",
+          "flag": "antler.png",
           "x": 0.999,
           "y": 0.019
         }
@@ -134,50 +160,62 @@
       "territories": [
         {
           "name": "Cinderella's House",
+          "flag": "jacques.png",
           "x": 0.401,
           "y": 0.256
         }, {
           "name": "Fairies' Cottage",
+          "flag": "dress.png",
           "x": 0.221,
           "y": 0.323
         }, {
           "name": "Maleficent's Castle",
+          "flag": "maleficent.png",
           "x": 0.435,
           "y": 0.082
         }, {
           "name": "Evil Queen's Castle",
+          "flag": "poisonapple.png",
           "x": 0.135,
           "y": 0.569
         }, {
           "name": "Ariel's Grotto",
+          "flag": "flounder.png",
           "x": 0.175,
           "y": 0.746
         }, {
           "name": "Eric's Castle",
+          "flag": "fork.png",
           "x": 0.007,
           "y": 0.769
         }, {
           "name": "Charming Palace",
+          "flag": "glassslipper.png",
           "x": 0.6,
           "y": 0.04
         }, {
           "name": "Atlantica",
+          "flag": "trident.png",
           "x": 0.264,
           "y": 0.575
         }, {
           "name": "Atlantis",
+          "flag": "pendant.png",
           "x": 0.308,
           "y": 0.064
         }, {
           "name": "Rapunzel's Tower",
+          "flag": "pascal.png",
           "x": 0.048,
           "y": 0.365
         }, {
           "name": "Corona",
+          "flag": "sun.png",
           "x": 0.322,
           "y": 0.44
         }, {
           "name": "Dwarves' Cottage",
+          "flag": "diamond.png",
           "x": 0,
           "y": 0.566
         }
@@ -188,18 +226,22 @@
       "territories": [
         {
           "name": "Realm of Monsters",
+          "flag": "tamatoa.png",
           "x": 0.044,
           "y": 0
         }, {
           "name": "Motonui",
+          "flag": "coconut.png",
           "x": 0.172,
           "y": 0.193
         }, {
           "name": "Te Fiti",
+          "flag": "tefiti.png",
           "x": 0.187,
           "y": 0.007
         }, {
           "name": "Maui's Island",
+          "flag": "hook.png",
           "x": 0.016,
           "y": 0.21
         }

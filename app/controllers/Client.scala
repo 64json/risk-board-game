@@ -234,6 +234,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "additionalArmies",
           "territories" -> List(
             "name",
+            "flag",
             "x",
             "y",
             "adjacencyTerritories",

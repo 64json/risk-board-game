@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {actions} from '../../reducers';
 import {classes} from '../../common/utils';
 import './stylesheet.scss';
 
@@ -12,11 +10,11 @@ class Territory extends Component {
 
   render() {
     const {territory, style, className} = this.props;
-    const {game} = this.props.server;
 
     return (
       <div className={classes('Territory', className)} style={style}
            onClick={this.handleClick}>
+        <img src={`/flags/${territory.flag}`} className="flag"/>
         <span className="name">
           {territory.name}
         </span>
@@ -31,4 +29,4 @@ class Territory extends Component {
   }
 }
 
-export default connect(({server}) => ({server}), actions)(Territory);
+export default Territory;

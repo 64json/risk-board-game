@@ -32,6 +32,7 @@ object Continent {
         (continent \ "territories").as[List[JsValue]].map(territory =>
           new Territory(
             (territory \ "name").as[String],
+            (territory \ "flag").as[String],
             (territory \ "x").as[Double],
             (territory \ "y").as[Double]
           )

@@ -18,8 +18,14 @@
   background-color: white;
   font-size: .64vw;
 
+  .flag {
+    width: 2.4em;
+    height: 2.4em;
+  }
+
   .name {
     font-weight: bold;
+    font-size: .8em;
     margin-bottom: .5em;
 
     &:last-child {
