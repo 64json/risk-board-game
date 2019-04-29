@@ -73,18 +73,16 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     players(turnIndex.get).allotting = true
     continents = Some(Continent.createContinents)
     // /* testing purpose:
-    getTerritories.foreach(allotArmy(players(turnIndex.get), _))
-    players.foreach(player => assignArmies(player, getTerritories.find(_.owner.contains(player)).get, player.assignedArmies))
+    territories.foreach(allotArmy(players(turnIndex.get), _))
+    players.foreach(player => assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies))
     val player = players(turnIndex.get)
-    assignArmies(player, getTerritories.find(_.owner.contains(player)).get, player.assignedArmies)
+    assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies)
     // */
   }
 
-  def getContinents: Option[List[Continent]] = continents
+  def territories: List[Territory] = continents.get.flatMap(_.territories)
 
-  def getTerritories: List[Territory] = continents.get.flatMap(_.territories)
-
-  def findTerritory(territoryId: String): Option[Territory] = getTerritories.find(_.id == territoryId)
+  def findTerritory(territoryId: String): Option[Territory] = territories.find(_.id == territoryId)
 
   def allotArmy(player: Player, territory: Territory): Unit = {
     if (territory.owner.isDefined) throw new Error("The territory is already occupied.")
@@ -92,7 +90,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     territory.armies = 1
     player.assignedArmies -= 1
     player.allotting = false
-    if (getTerritories.forall(_.owner.isDefined)) {
+    if (territories.forall(_.owner.isDefined)) {
       players.foreach(_.assigning = true)
       turnIndex = None
     } else {

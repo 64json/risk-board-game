@@ -60,8 +60,46 @@ class Socket {
         });
       };
       deepMerge(this, data);
+
+      if (this.game) {
+        const isId = obj => typeof obj === 'string';
+        if (isId(this.player)) {
+          this.player = this.findPlayer(this.player);
+        }
+        if (isId(this.game.owner)) {
+          this.game.owner = this.findPlayer(this.game.owner);
+        }
+        if (this.game.continents) {
+          this.game.continents.forEach(continent => {
+            continent.territories.forEach(territory => {
+              if (isId(territory.adjacencyTerritories[0])) {
+                territory.adjacencyTerritories = territory.adjacencyTerritories.map(adjacencyTerritory => this.findTerritory(adjacencyTerritory));
+              }
+              if (isId(territory.owner)) {
+                territory.owner = this.findPlayer(territory.owner);
+              }
+            });
+          });
+        }
+        if (this.game.attack) {
+          if (isId(this.game.attack.fromTerritory)) {
+            this.game.attack.fromTerritory = this.findTerritory(this.game.attack.fromTerritory);
+          }
+          if (isId(this.game.attack.toTerritory)) {
+            this.game.attack.toTerritory = this.findTerritory(this.game.attack.toTerritory);
+          }
+        }
+      }
     }
     if (onChange) onChange(this);
+  }
+
+  findPlayer(id) {
+    return this.game.players.find(player => player.id === id);
+  }
+
+  findTerritory(id) {
+    return this.game.continents.flatMap(continent => continent.territories).find(territory => territory.id === id);
   }
 
   send(method, args) {

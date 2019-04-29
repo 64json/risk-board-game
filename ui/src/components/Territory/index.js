@@ -13,7 +13,7 @@ class Territory extends Component {
   render() {
     const {territory, style, from, to, enabled, className} = this.props;
     const {game} = this.props.server;
-    const playerIndex = game.players.findIndex(p => p.id === territory.owner);
+    const playerIndex = game.players.indexOf(territory.owner);
 
     return (
       <div className={classes(
@@ -24,8 +24,9 @@ class Territory extends Component {
         enabled && 'enabled',
         className,
       )} style={style}
-           onClick={enabled && this.handleClick}>
-        <img src={`/flags/${territory.flag}`} className="flag"/>
+           onClick={enabled ? this.handleClick : null}>
+        <img alt={territory.flag} src={`/flags/${territory.flag}`}
+             className="flag"/>
         <span className="name">
           {territory.name}
         </span>

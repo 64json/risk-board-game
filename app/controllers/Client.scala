@@ -86,7 +86,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
 
   def getTerritory(territoryId: String): Territory = {
     val game = getGame()
-    val territory: Option[Territory] = game.getTerritories.find(_.id == territoryId)
+    val territory: Option[Territory] = game.territories.find(_.id == territoryId)
     if (territory.isEmpty) throw new Error("The territory is not found.")
     territory.get
   }
