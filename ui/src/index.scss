@@ -20,7 +20,7 @@ body {
   @mixin player($color-player) {
     color: $color-player;
 
-    &.selected {
+    &.active {
       background-color: $color-player;
       color: white;
     }
@@ -49,4 +49,13 @@ body {
   &.player-6 {
     @include player($color-player-6);
   }
+}
+
+input,
+button {
+  font-size: inherit;
+  color: inherit;
+  font-family: inherit;
+  border: none;
+  background: none;
 }

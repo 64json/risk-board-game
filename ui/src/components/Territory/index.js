@@ -11,19 +11,20 @@ class Territory extends Component {
   };
 
   render() {
-    const {territory, style, from, to, enabled, className} = this.props;
+    const {territory, style, selected, from, to, enabled, className} = this.props;
     const {game} = this.props.server;
     const playerIndex = game.players.indexOf(territory.owner);
 
     return (
       <div className={classes(
         'Territory',
-        territory.owner && `player-${playerIndex + 1} selected`,
+        territory.owner && `player-${playerIndex + 1} active`,
+        selected && 'selected',
         from && 'from',
         to && 'to',
         enabled && 'enabled',
         className,
-      )} style={style}
+        )} style={style}
            onClick={enabled ? this.handleClick : null}>
         <img alt={territory.flag} src={`/flags/${territory.flag}`}
              className="flag"/>

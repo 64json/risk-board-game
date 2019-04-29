@@ -66,14 +66,14 @@ class App extends Component {
           {
             question &&
             <form className="dialog" onSubmit={this.handleSubmitAnswer}>
-              <div className="question">
-                {question}
-              </div>
+              <div className="question" dangerouslySetInnerHTML={{__html:question}}/>
               <input className="answer" type="text" autoFocus value={answer}
                      onChange={this.handleChangeAnswer}/>
+              <div className="empty"/>
               <div className="buttons">
-                <button>Submit</button>
-                <button type="button" onClick={this.handleCancelDialog}>
+                <button className="button">Submit</button>
+                <button className="button" type="button"
+                        onClick={this.handleCancelDialog}>
                   Cancel
                 </button>
               </div>

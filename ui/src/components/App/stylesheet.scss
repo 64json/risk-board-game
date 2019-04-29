@@ -49,14 +49,13 @@
     }
 
     .dialog {
-      width: 32rem;
-      height: 16rem;
-      background-color: white;
+      width: 28rem;
+      height: 14rem;
+      background-color: $color-background;
       box-shadow: 0 0 8px rgba($color-hint, .5);
-      padding: 1rem;
+      padding: 2rem;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
 
       .question {
@@ -66,6 +65,34 @@
 
       .answer {
         margin-bottom: 1rem;
+        padding: .5rem .8rem;
+        border: 2px solid;
+        background-color: white;
+      }
+
+      .empty {
+        flex: 1
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: flex-end;
+
+        .button {
+          padding: .5rem .8rem;
+          display: flex;
+          flex-direction: column;
+          cursor: pointer;
+          align-items: center;
+          font-weight: bold;
+          background-color: white;
+          border: 2px solid;
+          margin-right: 1rem;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
       }
     }
   }

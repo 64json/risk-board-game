@@ -11,6 +11,7 @@ class Game extends Component {
     super(props);
 
     this.state = {
+      selectedTerritory: null,
       fromTerritory: null,
       toTerritory: null,
     };
@@ -37,8 +38,11 @@ class Game extends Component {
   };
 
   handleAssignArmies = territory => {
+    this.setState({selectedTerritory: territory});
     this.props.prompt('Enter the number of armies to assign: ', armies => {
       socket.assignArmies(territory.id, Number(armies) | 0);
+    }, null, () => {
+      this.setState({selectedTerritory: null});
     });
   };
 
@@ -148,7 +152,7 @@ class Game extends Component {
           const defendingTerritory = game.attack.toTerritory;
           const attackingPlayer = attackingTerritory.owner;
           if (defendingTerritory.owner === player) {
-            this.props.prompt(`${attackingPlayer.name} is attacking your ${defendingTerritory.name}. Enter the number of defending dice to roll: `, defendingDiceCount => {
+            this.props.prompt(`<b>${attackingPlayer.name}</b> is attacking your <b>${defendingTerritory.name}</b>.<br>Enter the number of defending dice to roll: `, defendingDiceCount => {
               socket.defend(Number(defendingDiceCount) | 0);
             });
           }
@@ -233,7 +237,7 @@ class Game extends Component {
 
   render() {
     const {game, player} = this.props.server;
-    const {fromTerritory, toTerritory} = this.state;
+    const {selectedTerritory, fromTerritory, toTerritory} = this.state;
     const instruction = this.getInstruction();
 
     const currentPlayer = game.players[game.turnIndex];
@@ -250,7 +254,7 @@ class Game extends Component {
               game.players.map((player, i) => {
                 return (
                   <div key={player.id}
-                       className={classes('player', game.playing && `player-${i + 1}`, currentPlayer && currentPlayer === player && 'selected')}>
+                       className={classes('player', game.playing && `player-${i + 1}`, currentPlayer && currentPlayer === player && 'active')}>
                     {
                       game.playing &&
                       <span className="turn">
@@ -279,26 +283,26 @@ class Game extends Component {
           <div className={classes('actions', `player-${game.turnIndex + 1}`)}>
             {
               player === game.owner && !game.playing &&
-              <div className="action" onClick={this.handleStartGame}>
+              <button className="action" onClick={this.handleStartGame}>
                 Start
-              </div>
+              </button>
             }
             {
               currentPlayer && currentPlayer === player && currentPlayer.attacking && !game.attack &&
-              <div className="action" onClick={this.handleEndAttack}>
+              <button className="action" onClick={this.handleEndAttack}>
                 End Attack
-              </div>
+              </button>
             }
             {
               currentPlayer && currentPlayer === player && currentPlayer.fortifying &&
-              <div className="action" onClick={this.handleEndFortify}>
+              <button className="action" onClick={this.handleEndFortify}>
                 Skip Fortifying
-              </div>
+              </button>
             }
           </div>
-          <div className="leave" onClick={this.handleLeaveGame}>
+          <button className="leave" onClick={this.handleLeaveGame}>
             Leave
-          </div>
+          </button>
         </div>
         <div className="board">
           {
@@ -322,6 +326,7 @@ class Game extends Component {
                   territories.map(territory => (
                     <Territory
                       key={territory.id} territory={territory}
+                      selected={territory === selectedTerritory}
                       from={territory === fromTerritory || (game.attack && game.attack.fromTerritory === territory)}
                       to={territory === toTerritory || (game.attack && game.attack.toTerritory === territory)}
                       onClick={instruction.onClick}
