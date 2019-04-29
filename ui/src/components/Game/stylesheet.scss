@@ -16,7 +16,7 @@
       align-self: center;
       font-size: $font-size-large;
       font-weight: bold;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
     }
 
     .players {
@@ -26,8 +26,13 @@
 
       .player {
         flex: 1;
-        padding: .5rem;
+        padding: 1rem;
         display: flex;
+        border-bottom: 2px solid $color-hint;
+
+        &:first-child {
+          border-top: 2px solid $color-hint;
+        }
 
         .turn {
           font-weight: bold;
@@ -55,7 +60,7 @@
     }
 
     .instruction {
-      font-size: $font-size-large;
+      font-size: $font-size-medium;
       margin-bottom: 1rem;
     }
 
