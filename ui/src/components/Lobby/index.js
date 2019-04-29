@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import socket from '../../common/socket';
 import {actions} from '../../reducers';
+import {classes} from '../../common/utils';
 import './stylesheet.scss';
 
 class Lobby extends Component {
@@ -33,12 +34,16 @@ class Lobby extends Component {
           {
             games.map(game => (
               <div key={game.id}
-                   className="game"
+                   className={classes('game', game.playing && 'disabled')}
                    onClick={() => this.handleJoinGame(game.id)}>
                 <span className="name">{game.name}</span>
                 <div className="row">
                   <span className="owner">{game.owner.name}</span>
-                  <span className="players">{game.players.length}</span>
+                  {
+                    game.playing ?
+                      <span className="playing">Playing ...</span> :
+                      <span className="players">{game.players.length}</span>
+                  }
                 </div>
               </div>
             ))
