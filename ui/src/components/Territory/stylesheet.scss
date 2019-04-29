@@ -38,10 +38,29 @@
 
   }
 
+  @keyframes glow {
+    from {
+      box-shadow: 0 0 1em .5em $color-background;
+    }
+
+    to {
+      box-shadow: 0 0 1em 1em $color-background;
+    }
+  }
+
+  &.enabled {
+    animation: .5s glow alternate infinite;
+  }
+
+  &.from,
+  &.to {
+    box-shadow: 0 0 1em 1em $color-background;
+    animation: none;
+  }
+
   &.from,
   &.to {
     transform: scale(1.2);
-    box-shadow: 0 0 1em .1em;
   }
 
   &.from {
@@ -50,9 +69,5 @@
 
   &.to {
     z-index: 1;
-  }
-
-  &.enabled {
-    box-shadow: 0 0 1em .1em;
   }
 }

@@ -5,10 +5,12 @@
   display: flex;
 
   .sidebar {
-    width: 20rem;
-    padding: 1rem;
+    width: 22rem;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
+    background-color: $color-background;
+    box-shadow: 0 0 8px rgba($color-hint, .5);
 
     .title {
       align-self: center;
@@ -49,15 +51,42 @@
         .status {
 
         }
-
-        &.current {
-          border: 2px solid;
-        }
       }
     }
 
     .instruction {
       font-size: $font-size-large;
+      margin-bottom: 1rem;
+    }
+
+    .actions {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .action {
+        padding: .5rem .8rem;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        align-items: center;
+        font-weight: bold;
+        background-color: white;
+        border: 2px solid;
+      }
+    }
+
+    .leave {
+      align-self: flex-end;
+      cursor: pointer;
+      color: $color-hint;
     }
   }
 
@@ -66,7 +95,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: white;
     position: relative;
 
     .map {
@@ -82,7 +110,7 @@
         height: 100%;
 
         .link {
-          stroke: $color-unclaimed;
+          stroke: $color-hint;
           stroke-width: .2px;
         }
       }

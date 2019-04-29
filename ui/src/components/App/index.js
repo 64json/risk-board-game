@@ -32,18 +32,18 @@ class App extends Component {
 
     const {onAnswer, onClose} = this.props.dialog;
     const {answer} = this.state;
-    if (onAnswer) onAnswer(answer);
-    if (onClose) onClose();
     this.setState({answer: ''});
     this.props.prompt(null, null);
+    if (onAnswer) onAnswer(answer);
+    if (onClose) onClose();
   };
 
   handleCancelDialog = e => {
     const {onCancel, onClose} = this.props.dialog;
-    if (onCancel) onCancel();
-    if (onClose) onClose();
     this.setState({answer: ''});
     this.props.prompt(null, null);
+    if (onCancel) onCancel();
+    if (onClose) onClose();
   };
 
   render() {
@@ -53,13 +53,15 @@ class App extends Component {
 
     return (
       <div className="App">
-        {
-          connected && (
-            game && player ?
-              <Game/> :
-              <Lobby/>
-          )
-        }
+        <div className="main">
+          {
+            connected && (
+              game && player ?
+                <Game/> :
+                <Lobby/>
+            )
+          }
+        </div>
         <div className="dialogContainer">
           {
             question &&

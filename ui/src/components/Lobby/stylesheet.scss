@@ -1,0 +1,89 @@
+@import "../../common/constants";
+
+.Lobby {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem;
+
+  .title {
+    display: flex;
+    align-items: center;
+    font-size: $font-size-largest;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 8px rgba($color-hint, .5);
+
+    .icon {
+      font-size: 2rem;
+      margin-right: .5rem;
+    }
+  }
+
+  .create {
+    margin-bottom: 1rem;
+  }
+
+  .games {
+    display: flex;
+    flex-direction: column;
+    width: 20rem;
+
+    .game {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      background-color: $color-background;
+      box-shadow: 0 0 8px rgba($color-hint, .5);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .name {
+        margin-bottom: .5rem;
+        font-size: $font-size-large;
+        font-weight: bold;
+        color: $color-font;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        color: $color-font;
+
+        .owner {
+          display: flex;
+          align-items: center;
+          font-size: $font-size-small;
+
+          &:before {
+            content: 'Created by ';
+            color: $color-hint;
+          }
+        }
+
+        .players {
+          display: flex;
+          align-items: center;
+          font-weight: bold;
+
+          &:after {
+            content: ' / 6';
+            color: $color-hint;
+            font-weight: normal;
+          }
+        }
+      }
+
+      &.create {
+        align-items: center;
+        font-weight: bold;
+        border-color: $color-font;
+        background-color: white;
+      }
+    }
+  }
+}

@@ -78,12 +78,12 @@ class Game extends Component {
     const {game, player} = this.props.server;
     if (!game.playing) {
       return {
-        text: 'Waiting ...',
+        text: 'Waiting for players to join ...',
       };
     } else {
       if (player.allotting) {
         return {
-          text: 'Choose an unoccupied territory to allot an army to',
+          text: 'Choose an unoccupied territory to allot an army to.',
           isEnabled: territory => !territory.owner,
           onClick: this.handleAllotArmy,
         };
@@ -250,7 +250,7 @@ class Game extends Component {
               game.players.map((player, i) => {
                 return (
                   <div key={player.id}
-                       className={classes('player', game.playing && `player-${i + 1}`, currentPlayer && currentPlayer === player && 'current')}>
+                       className={classes('player', game.playing && `player-${i + 1}`, currentPlayer && currentPlayer === player && 'selected')}>
                     {
                       game.playing &&
                       <span className="turn">
@@ -276,28 +276,28 @@ class Game extends Component {
           <div className="instruction">
             {instruction.text}
           </div>
-          <div className="actions">
+          <div className={classes('actions', `player-${game.turnIndex + 1}`)}>
             {
               player === game.owner && !game.playing &&
-              <button onClick={this.handleStartGame}>
+              <div className="action" onClick={this.handleStartGame}>
                 Start
-              </button>
+              </div>
             }
             {
               currentPlayer && currentPlayer === player && currentPlayer.attacking && !game.attack &&
-              <button onClick={this.handleEndAttack}>
+              <div className="action" onClick={this.handleEndAttack}>
                 End Attack
-              </button>
+              </div>
             }
             {
               currentPlayer && currentPlayer === player && currentPlayer.fortifying &&
-              <button onClick={this.handleEndFortify}>
+              <div className="action" onClick={this.handleEndFortify}>
                 Skip Fortifying
-              </button>
+              </div>
             }
-            <button onClick={this.handleLeaveGame}>
-              Leave
-            </button>
+          </div>
+          <div className="leave" onClick={this.handleLeaveGame}>
+            Leave
           </div>
         </div>
         <div className="board">

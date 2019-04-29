@@ -61,8 +61,15 @@ class Socket {
       };
       deepMerge(this, data);
 
+      const isId = obj => typeof obj === 'string';
+      if (this.games) {
+        this.games.forEach(game => {
+          if (isId(game.owner)) {
+            game.owner = this.findPlayer(game.owner, game);
+          }
+        });
+      }
       if (this.game) {
-        const isId = obj => typeof obj === 'string';
         if (isId(this.player)) {
           this.player = this.findPlayer(this.player);
         }
@@ -94,8 +101,8 @@ class Socket {
     if (onChange) onChange(this);
   }
 
-  findPlayer(id) {
-    return this.game.players.find(player => player.id === id);
+  findPlayer(id, game = this.game) {
+    return game.players.find(player => player.id === id);
   }
 
   findTerritory(id) {

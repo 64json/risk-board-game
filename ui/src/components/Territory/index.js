@@ -18,7 +18,7 @@ class Territory extends Component {
     return (
       <div className={classes(
         'Territory',
-        territory.owner && `player-${playerIndex + 1}`,
+        territory.owner && `player-${playerIndex + 1} selected`,
         from && 'from',
         to && 'to',
         enabled && 'enabled',

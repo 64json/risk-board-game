@@ -5,6 +5,7 @@ body {
   padding: 0;
   font-family: sans-serif;
   font-size: $font-size-medium;
+  color: $color-font;
 }
 
 * {
@@ -16,33 +17,36 @@ body {
     white-space: pre;
   }
 
+  @mixin player($color-player) {
+    color: $color-player;
+
+    &.selected {
+      background-color: $color-player;
+      color: white;
+    }
+  }
+
   &.player-1 {
-    border-color: $color-player-1;
-    color: $color-player-1;
+    @include player($color-player-1);
   }
 
   &.player-2 {
-    border-color: $color-player-2;
-    color: $color-player-2;
+    @include player($color-player-2);
   }
 
   &.player-3 {
-    border-color: $color-player-3;
-    color: $color-player-3;
+    @include player($color-player-3);
   }
 
   &.player-4 {
-    border-color: $color-player-4;
-    color: $color-player-4;
+    @include player($color-player-4);
   }
 
   &.player-5 {
-    border-color: $color-player-5;
-    color: $color-player-5;
+    @include player($color-player-5);
   }
 
   &.player-6 {
-    border-color: $color-player-6;
-    color: $color-player-6;
+    @include player($color-player-6);
   }
 }

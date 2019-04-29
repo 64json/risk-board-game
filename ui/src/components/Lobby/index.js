@@ -2,29 +2,16 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import socket from '../../common/socket';
 import {actions} from '../../reducers';
-
-import './stylesheet.css';
+import './stylesheet.scss';
 
 class Lobby extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      gameName: '',
-    };
-  }
-
-  handleChangeGameName = e => {
-    const gameName = e.target.value;
-    this.setState({gameName});
-  };
-
   handleCreateGame = e => {
     e.preventDefault();
 
-    const {gameName} = this.state;
-    this.props.prompt('Please enter the player name.', playerName => {
-      socket.createGame(gameName, playerName);
+    this.props.prompt('Please enter the game name.', gameName => {
+      this.props.prompt('Please enter the player name.', playerName => {
+        socket.createGame(gameName, playerName);
+      });
     });
   };
 
@@ -36,29 +23,30 @@ class Lobby extends Component {
 
   render() {
     const {games} = this.props.server;
-    const {gameName} = this.state;
 
     return (
       <div className="Lobby">
-        <form onSubmit={this.handleCreateGame}>
-          <input type="text" value={gameName}
-                 placeholder="Game Name"
-                 onChange={this.handleChangeGameName}/>
-          <button>
+        <div className="title">
+          <span className="icon">🗺</span>Risk: Disney Edition
+        </div>
+        <div className="games">
+          {
+            games.map(game => (
+              <div key={game.id}
+                   className="game"
+                   onClick={() => this.handleJoinGame(game.id)}>
+                <span className="name">{game.name}</span>
+                <div className="row">
+                  <span className="owner">{game.owner.name}</span>
+                  <span className="players">{game.players.length}</span>
+                </div>
+              </div>
+            ))
+          }
+          <div className="game create" onClick={this.handleCreateGame}>
             Create Game
-          </button>
-        </form>
-        {
-          games.map(game => (
-            <div key={game.id}>
-              {game.name} ({game.players.length}/6)
-              <button
-                onClick={() => this.handleJoinGame(game.id)}>
-                Join
-              </button>
-            </div>
-          ))
-        }
+          </div>
+        </div>
       </div>
     );
   }
