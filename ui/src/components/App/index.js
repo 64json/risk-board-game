@@ -46,9 +46,13 @@ class App extends Component {
     if (onClose) onClose();
   };
 
+  handleKeyDown = e => {
+    if (e.key === 'Escape') this.handleCancelDialog();
+  };
+
   render() {
     const {question} = this.props.dialog;
-    const {connected, game, player} = this.props.server;
+    const {game, player} = this.props.server;
     const {answer} = this.state;
 
     return (
@@ -67,7 +71,8 @@ class App extends Component {
               <div className="question"
                    dangerouslySetInnerHTML={{__html: question}}/>
               <input className="answer" type="text" autoFocus value={answer}
-                     onChange={this.handleChangeAnswer}/>
+                     onChange={this.handleChangeAnswer}
+                     onKeyDown={this.handleKeyDown}/>
               <div className="empty"/>
               <div className="buttons">
                 <button className="button">Submit</button>
