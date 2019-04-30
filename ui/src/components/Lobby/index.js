@@ -51,7 +51,7 @@ class Lobby extends Component {
                 ))
               }
               <div className="game create" onClick={this.handleCreateGame}>
-                Create Game
+                Create a Game
               </div>
             </div> :
             <span className="connecting">

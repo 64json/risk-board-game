@@ -12,6 +12,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   var turnIndex: Option[Int] = None
   var continents: Option[List[Continent]] = None
   var attack: Option[Attack] = None
+  var winner: Option[Player] = None
 
   override def fields: Map[String, Any] = Map(
     "id" -> id,
@@ -21,7 +22,8 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     "owner" -> owner,
     "turnIndex" -> turnIndex,
     "continents" -> continents,
-    "attack" -> attack
+    "attack" -> attack,
+    "winner" -> winner
   )
 
   override def receivers: List[Client] = players.map(_.client)
@@ -42,21 +44,21 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
 
     val playerIndex = players.indexOf(player)
     players = players.filter(_ != player)
-    if (turnIndex.isDefined) {
-      if (playerIndex < turnIndex.get) {
-        turnIndex = Some(turnIndex.get - 1)
-      } else if (playerIndex == turnIndex.get) {
-        turnIndex = Some(turnIndex.get % players.length)
-        if (territories.forall(_.owner.isDefined)) {
-          giveArmies()
-        } else {
-          players(turnIndex.get).allotting = true
-        }
-      }
-    }
     if (players.isEmpty) {
       destroy()
     } else {
+      if (turnIndex.isDefined) {
+        if (playerIndex < turnIndex.get) {
+          turnIndex = Some(turnIndex.get - 1)
+        } else if (playerIndex == turnIndex.get) {
+          turnIndex = Some(turnIndex.get % players.length)
+          if (territories.forall(_.owner.isDefined)) {
+            giveArmies()
+          } else {
+            players(turnIndex.get).allotting = true
+          }
+        }
+      }
       if (owner == player) {
         owner = players.head
       }
@@ -64,7 +66,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
         // transfer the ownership of each territory to a random player
         territories.filter(_.owner.contains(player)).foreach(_.owner = Some(players(Random.nextInt(players.length))))
         if (players.length == 1) {
-          // TODO: the only player wins the game
+          winner = Some(players.head)
         }
       }
     }
@@ -86,12 +88,12 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     turnIndex = Some(0)
     players(turnIndex.get).allotting = true
     continents = Some(Continent.createContinents)
-    /* testing purpose:
+//    /* testing purpose:
     territories.foreach(allotArmy(players(turnIndex.get), _))
     players.foreach(player => assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies))
     val player = players(turnIndex.get)
     assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies)
-    */
+//    */
   }
 
   def territories: List[Territory] = continents.get.flatMap(_.territories)
@@ -132,7 +134,12 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   }
 
   def giveArmies(): Unit = {
-    val player = players(turnIndex.get)
+    var player = players(turnIndex.get)
+    // skips players who don't own any territory
+    while (!territories.exists(_.owner.contains(player))) {
+      turnIndex = Some((turnIndex.get + 1) % players.length)
+      player = players(turnIndex.get)
+    }
     var totalTerritoryCount = 0
     continents.get.foreach(continent => {
       val continentTerritoryCount = continent.territories.count(_.owner.contains(player))
@@ -161,6 +168,7 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     if (defendingDiceCount < 1) throw new Error("The defending dice cannot be less than 1.")
     if (defendingDiceCount > attack.get.toTerritory.armies) throw new Error("You must have at least as many armies as dice being rolled.")
     attack.get.defend(defendingDiceCount)
+    winner = players.find(player => territories.forall(_.owner.contains(player)))
   }
 
   def endAttack(player: Player): Unit = {

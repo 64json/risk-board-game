@@ -26,10 +26,12 @@ class Game extends Component {
   };
 
   handleEndAttack = () => {
+    this.setState({fromTerritory: null});
     socket.endAttack();
   };
 
   handleEndFortify = () => {
+    this.setState({fromTerritory: null});
     socket.endFortify();
   };
 
@@ -85,7 +87,17 @@ class Game extends Component {
         text: 'Waiting for players to join ...',
       };
     } else {
-      if (player.allotting) {
+      if (game.winner) {
+        if (player === game.winner) {
+          return {
+            text: 'You won the game!',
+          };
+        } else {
+          return {
+            text: `<b>${game.winner.name}</b> won the game!`,
+          };
+        }
+      } else if (player.allotting) {
         return {
           text: 'Choose an unoccupied territory to allot an army to.',
           isEnabled: territory => !territory.owner,
@@ -158,7 +170,7 @@ class Game extends Component {
           }
         }
         return {
-          text: `${currentPlayer.name} is ${currentPlayer.allotting ? 'allott' : currentPlayer.assigning ? 'assign' : currentPlayer.attacking ? 'attack' : currentPlayer.fortifying ? 'fortify' : 'doing someth'}ing.`,
+          text: `<b>${currentPlayer.name}</b> is ${currentPlayer.allotting ? 'allott' : currentPlayer.assigning ? 'assign' : currentPlayer.attacking ? 'attack' : currentPlayer.fortifying ? 'fortify' : 'doing someth'}ing.`,
         };
       }
     }
@@ -275,9 +287,8 @@ class Game extends Component {
               })
             }
           </div>
-          <div className="instruction">
-            {instruction.text}
-          </div>
+          <div className="instruction"
+               dangerouslySetInnerHTML={{__html: instruction.text}}/>
           <div className={classes('actions', `player-${player.color}`)}>
             {
               player === game.owner && !game.playing &&
@@ -342,6 +353,12 @@ class Game extends Component {
             {
               game.attack && game.attack.done &&
               this.renderAttack()
+            }
+          </div>
+          <div className="winnerContainer">
+            {
+              game.winner &&
+              <span>🏆 {game.owner.name} 🏆</span>
             }
           </div>
         </div>

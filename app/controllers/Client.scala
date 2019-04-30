@@ -212,7 +212,8 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
           "territories" -> List(
             "owner"
           )
-        )
+        ),
+        "winner"
       )
     )
   }
@@ -356,6 +357,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
             )
           ),
           "attack",
+          "winner"
         )
       )
     }

@@ -96,6 +96,9 @@ class Socket {
             this.game.attack.toTerritory = this.findTerritory(this.game.attack.toTerritory);
           }
         }
+        if (isId(this.game.winner)) {
+          this.game.winner = this.findPlayer(this.game.winner);
+        }
       }
     }
     if (onChange) onChange(this);

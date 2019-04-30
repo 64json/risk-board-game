@@ -33,7 +33,7 @@ class Territory extends Component {
         {
           territory.owner &&
           <span className="armies">
-            {territory.armies} armies
+            {territory.armies}
           </span>
         }
       </div>

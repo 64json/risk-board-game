@@ -35,7 +35,13 @@
   }
 
   .armies {
+    font-size: 1.2em;
 
+    &:after {
+      margin-left: .4em;
+      content: 'armies';
+      font-size: .8em;
+    }
   }
 
   @keyframes glow {

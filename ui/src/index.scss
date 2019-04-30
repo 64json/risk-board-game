@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Itim');
 @import "./common/constants";
 
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Itim', cursive;
   font-size: $font-size-medium;
   color: $color-font;
 }
