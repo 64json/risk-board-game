@@ -26,6 +26,10 @@ body {
     }
   }
 
+  &.player-0 {
+    @include player($color-player-0);
+  }
+
   &.player-1 {
     @include player($color-player-1);
   }
@@ -44,10 +48,6 @@ body {
 
   &.player-5 {
     @include player($color-player-5);
-  }
-
-  &.player-6 {
-    @include player($color-player-6);
   }
 }
 

@@ -6,8 +6,6 @@ import models.interface.Identifiable
 import play.api.libs.json.{JsValue, Json}
 
 class Continent(val name: String, val additionalArmies: Int, val territories: List[Territory]) extends Identifiable {
-  def apply(number: Int): Territory = territories(number - 1)
-
   override def fields: Map[String, Any] = Map(
     "id" -> id,
     "name" -> name,

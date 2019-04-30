@@ -169,8 +169,6 @@ class Game extends Component {
     const {fromTerritory, toTerritory} = game.attack;
     const attacker = fromTerritory.owner;
     const defender = toTerritory.owner;
-    const attackerIndex = game.players.indexOf(attacker);
-    const defenderIndex = game.players.indexOf(defender);
     const attackingDice = game.attack.attackingDice.split('').map(die => ({
       value: Number(die),
       win: false,
@@ -204,7 +202,7 @@ class Game extends Component {
     return (
       <div className="attack">
         <div
-          className={classes('player', 'attacker', `player-${attackerIndex + 1}`)}>
+          className={classes('player', 'attacker', `player-${attacker.color}`)}>
           <span className="name">{attacker.name}</span>
           <div className="dice">
             {
@@ -218,7 +216,7 @@ class Game extends Component {
           </div>
         </div>
         <div
-          className={classes('player', 'defender', `player-${defenderIndex + 1}`)}>
+          className={classes('player', 'defender', `player-${defender.color}`)}>
           <span className="name">{defender.name}</span>
           <div className="dice">
             {
@@ -254,7 +252,7 @@ class Game extends Component {
               game.players.map((player, i) => {
                 return (
                   <div key={player.id}
-                       className={classes('player', game.playing && `player-${i + 1}`, currentPlayer && currentPlayer === player && 'active')}>
+                       className={classes('player', game.playing && `player-${player.color}`, currentPlayer && currentPlayer === player && 'active')}>
                     {
                       game.playing &&
                       <span className="turn">
@@ -280,7 +278,7 @@ class Game extends Component {
           <div className="instruction">
             {instruction.text}
           </div>
-          <div className={classes('actions', `player-${game.turnIndex + 1}`)}>
+          <div className={classes('actions', `player-${player.color}`)}>
             {
               player === game.owner && !game.playing &&
               <button className="action" onClick={this.handleStartGame}>

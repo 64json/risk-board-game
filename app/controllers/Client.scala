@@ -201,12 +201,16 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
     send("game", "player")
     game.send(
       "game" -> List(
-        "players",
+        "players" -> List(
+          "assignedArmies",
+          "allotting",
+          "assigning",
+        ),
         "owner",
+        "turnIndex",
         "continents" -> List(
           "territories" -> List(
-            "owner",
-            "armies"
+            "owner"
           )
         )
       )
@@ -222,6 +226,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
       "game" -> List(
         "playing",
         "players" -> List(
+          "color",
           "assignedArmies",
           "allotting",
           "assigning",

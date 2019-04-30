@@ -23,35 +23,41 @@ class Lobby extends Component {
   };
 
   render() {
-    const {games} = this.props.server;
+    const {connected, games} = this.props.server;
 
     return (
       <div className="Lobby">
         <div className="title">
           <span className="icon">🗺</span>Risk: Disney Edition
         </div>
-        <div className="games">
-          {
-            games.map(game => (
-              <div key={game.id}
-                   className={classes('game', game.playing && 'disabled')}
-                   onClick={() => this.handleJoinGame(game.id)}>
-                <span className="name">{game.name}</span>
-                <div className="row">
-                  <span className="owner">{game.owner.name}</span>
-                  {
-                    game.playing ?
-                      <span className="playing">Playing ...</span> :
-                      <span className="players">{game.players.length}</span>
-                  }
-                </div>
+        {
+          connected ?
+            <div className="games">
+              {
+                games.map(game => (
+                  <div key={game.id}
+                       className={classes('game', game.playing && 'disabled')}
+                       onClick={() => this.handleJoinGame(game.id)}>
+                    <span className="name">{game.name}</span>
+                    <div className="row">
+                      <span className="owner">{game.owner.name}</span>
+                      {
+                        game.playing ?
+                          <span className="playing">Playing ...</span> :
+                          <span className="players">{game.players.length}</span>
+                      }
+                    </div>
+                  </div>
+                ))
+              }
+              <div className="game create" onClick={this.handleCreateGame}>
+                Create Game
               </div>
-            ))
-          }
-          <div className="game create" onClick={this.handleCreateGame}>
-            Create Game
-          </div>
-        </div>
+            </div> :
+            <span className="connecting">
+              Connecting to server ...
+            </span>
+        }
       </div>
     );
   }

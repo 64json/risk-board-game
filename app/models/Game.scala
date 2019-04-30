@@ -40,7 +40,20 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
   def leave(player: Player): Unit = {
     if (!players.contains(player)) throw new Error("The player is not in the game.")
 
+    val playerIndex = players.indexOf(player)
     players = players.filter(_ != player)
+    if (turnIndex.isDefined) {
+      if (playerIndex < turnIndex.get) {
+        turnIndex = Some(turnIndex.get - 1)
+      } else if (playerIndex == turnIndex.get) {
+        turnIndex = Some(turnIndex.get % players.length)
+        if (territories.forall(_.owner.isDefined)) {
+          giveArmies()
+        } else {
+          players(turnIndex.get).allotting = true
+        }
+      }
+    }
     if (players.isEmpty) {
       destroy()
     } else {
@@ -48,12 +61,8 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
         owner = players.head
       }
       if (playing) {
-        continents.get.foreach(_.territories.foreach(territory => {
-          if (territory.owner.contains(player)) {
-            // TODO: donate the territory to its neighbors?
-            territory.reset()
-          }
-        }))
+        // transfer the ownership of each territory to a random player
+        territories.filter(_.owner.contains(player)).foreach(_.owner = Some(players(Random.nextInt(players.length))))
         if (players.length == 1) {
           // TODO: the only player wins the game
         }
@@ -66,18 +75,23 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     if (players.length > 6) throw new Error("Too many players.")
 
     playing = true
-    val assignedArmies = 20 + (6 - players.length) * 5
-    players.foreach(_.assignedArmies = assignedArmies)
     players = Random.shuffle(players)
+    val assignedArmies = 20 + (6 - players.length) * 5
+    var colors = Random.shuffle(List.range(0, 6))
+    players.foreach(player => {
+      player.color = Some(colors.head)
+      colors = colors.tail
+      player.assignedArmies = assignedArmies
+    })
     turnIndex = Some(0)
     players(turnIndex.get).allotting = true
     continents = Some(Continent.createContinents)
-    // /* testing purpose:
+    /* testing purpose:
     territories.foreach(allotArmy(players(turnIndex.get), _))
     players.foreach(player => assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies))
     val player = players(turnIndex.get)
     assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies)
-    // */
+    */
   }
 
   def territories: List[Territory] = continents.get.flatMap(_.territories)

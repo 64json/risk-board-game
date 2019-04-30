@@ -55,18 +55,17 @@ class App extends Component {
       <div className="App">
         <div className="main">
           {
-            connected && (
-              game && player ?
-                <Game/> :
-                <Lobby/>
-            )
+            game && player ?
+              <Game/> :
+              <Lobby/>
           }
         </div>
         <div className="dialogContainer">
           {
             question &&
             <form className="dialog" onSubmit={this.handleSubmitAnswer}>
-              <div className="question" dangerouslySetInnerHTML={{__html:question}}/>
+              <div className="question"
+                   dangerouslySetInnerHTML={{__html: question}}/>
               <input className="answer" type="text" autoFocus value={answer}
                      onChange={this.handleChangeAnswer}/>
               <div className="empty"/>
