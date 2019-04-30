@@ -3,32 +3,38 @@
 .Game {
   flex: 1;
   display: flex;
+  overflow: auto;
 
   .sidebar {
-    width: 22rem;
-    padding: 2rem;
+    width: 32vw;
+    padding: 2rem 1rem 1rem;
     display: flex;
     flex-direction: column;
+    align-items: center;
     background-color: $color-background;
     box-shadow: 0 0 8px rgba($color-hint, .5);
+    overflow-y: auto;
 
     .title {
       align-self: center;
-      font-size: $font-size-large;
+      font-size: $font-size-largest;
       font-weight: bold;
+      text-align: center;
       margin-bottom: 2rem;
     }
 
     .players {
+      align-self: stretch;
       display: flex;
       flex-direction: column;
-      margin-bottom: 1rem;
+      margin: 0 -1rem 2rem;
 
       .player {
         flex: 1;
         padding: 1rem;
         display: flex;
         border-bottom: 2px solid $color-hint;
+        flex-wrap: wrap;
 
         &:first-child {
           border-top: 2px solid $color-hint;
@@ -43,10 +49,12 @@
           font-weight: bold;
           display: flex;
           align-items: center;
+          margin-right: .5rem;
 
           &.you {
             &:after {
-              content: ' (You)';
+              content: '(You)';
+              margin-left: .5rem;
               font-weight: normal;
               font-size: $font-size-small;
             }
@@ -60,14 +68,13 @@
     }
 
     .instruction {
-      font-size: $font-size-medium;
+      font-size: $font-size-large;
       margin-bottom: 1rem;
+      text-align: center;
     }
 
     .actions {
-      flex: 1;
       display: flex;
-      align-items: flex-start;
       margin-right: 1rem;
       margin-bottom: 1rem;
 
@@ -87,6 +94,10 @@
       }
     }
 
+    .empty {
+      flex: 1;
+    }
+
     .leave {
       align-self: flex-end;
       cursor: pointer;
@@ -100,12 +111,13 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    padding: $territory-width;
 
     .map {
-      width: 64vw;
-      height: 40vw;
+      $map-width: 68vw - $territory-width * 2;
+      width: $map-width;
+      height: $map-width / 1.6;
       position: relative;
-      margin: $territory-height / 2 $territory-width / 2;
       user-select: none;
 
       .svg {
@@ -255,6 +267,24 @@
       &:empty {
         background-color: rgba(black, 0);
         pointer-events: none;
+      }
+    }
+  }
+}
+
+@media only screen and (orientation:portrait) {
+  .Game {
+    flex-direction: column;
+
+    .sidebar {
+      width: auto;
+    }
+
+    .board {
+      .map {
+        $map-width: 100vw - $territory-width * 2;
+        width: $map-width;
+        height: $map-width / 1.6;
       }
     }
   }

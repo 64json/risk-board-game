@@ -16,9 +16,11 @@ class App extends Component {
 
   componentDidMount() {
     socket.open(this.props.updateData);
+    this.aliveInterval = window.setInterval(() => socket.keepAlive(), 10 * 1000);
   }
 
   componentWillUnmount() {
+    window.clearInterval(this.aliveInterval);
     socket.close();
   }
 

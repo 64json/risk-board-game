@@ -6,7 +6,7 @@ class Socket {
     this.player = null;
 
     this.close();
-    this.ws = new WebSocket('ws://localhost:9000/api/ws');
+    this.ws = new WebSocket(`ws://${document.domain}:9000/api/ws`);
     this.ws.onmessage = message => this.receive(message, onChange);
   }
 
@@ -158,6 +158,10 @@ class Socket {
 
   endFortify() {
     this.send('endFortify', []);
+  }
+
+  keepAlive() {
+    this.send('keepAlive', []);
   }
 }
 

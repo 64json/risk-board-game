@@ -1,15 +1,16 @@
 {
-  "short_name": "Play React",
-  "name": "Scala Play React Seed",
+  "short_name": "Risk: Disney Edition",
+  "name": "Risk: Disney Edition",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "favicon.png",
+      "sizes": "160x160",
+      "type": "image/png"
     }
   ],
-  "start_url": "./index.html",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "start_url": "./",
+  "display": "browser",
+  "orientation": "landscape",
+  "theme_color": "#f0f0f0",
+  "background_color": "#f0f0f0"
 }

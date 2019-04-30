@@ -147,6 +147,10 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
 
       case "endFortify" =>
         endFortify()
+
+      case "keepAlive" =>
+
+      case _ => throw new Error(s"Unknown method '${method}'.")
     }
   }
 

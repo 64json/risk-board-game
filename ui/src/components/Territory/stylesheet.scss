@@ -22,12 +22,13 @@
   .flag {
     width: 2.4em;
     height: 2.4em;
+    margin-bottom: .2em;
   }
 
   .name {
     font-weight: bold;
-    font-size: .8em;
-    margin-bottom: .5em;
+    font-size: .9em;
+    margin-bottom: .2em;
 
     &:last-child {
       margin-bottom: 0;
@@ -36,11 +37,13 @@
 
   .armies {
     font-size: 1.2em;
+    display: flex;
+    align-items: center;
 
     &:after {
       margin-left: .4em;
       content: 'armies';
-      font-size: .8em;
+      font-size: .833em;
     }
   }
 
@@ -56,6 +59,7 @@
 
   &.enabled {
     animation: .5s glow alternate infinite;
+    cursor: pointer;
   }
 
   &.selected,

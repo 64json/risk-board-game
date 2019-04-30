@@ -1,5 +1,5 @@
 $territory-width: 5.2vw;
-$territory-height: 5.2vw;
+$territory-height: $territory-width;
 
 $color-background: #f0f0f0;
 $color-font: #444444;
@@ -13,7 +13,7 @@ $color-player-4: #26a69a;
 $color-player-5: #9ccc65;
 $color-unclaimed: $color-hint;
 
-$font-size-largest: 24px;
-$font-size-large: 20px;
-$font-size-medium: 16px;
-$font-size-small: 12px;
+$font-size-largest: 1.5rem;
+$font-size-large: 1.25rem;
+$font-size-medium: 1rem;
+$font-size-small: 0.75rem;

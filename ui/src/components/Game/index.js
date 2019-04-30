@@ -275,13 +275,17 @@ class Game extends Component {
                       className={classes('name', this.props.server.player === player && 'you')}>
                       {player.name}
                     </span>
-                    <span className="status">
-                      {
-                        game.playing ?
-                          `${player.assignedArmies} armies` :
-                          player === game.owner && 'Host'
-                      }
-                    </span>
+                    {
+                      game.playing ?
+                        player.assignedArmies > 0 &&
+                        <span className="status">
+                          + {player.assignedArmies} armies
+                        </span> :
+                        player === game.owner &&
+                        <span className="status">
+                          Host
+                        </span>
+                    }
                   </div>
                 );
               })
@@ -309,6 +313,7 @@ class Game extends Component {
               </button>
             }
           </div>
+          <div className="empty"/>
           <button className="leave" onClick={this.handleLeaveGame}>
             Leave
           </button>
