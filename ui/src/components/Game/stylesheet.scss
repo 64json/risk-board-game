@@ -3,7 +3,7 @@
 .Game {
   flex: 1;
   display: flex;
-  overflow: auto;
+  overflow-y: auto;
 
   .sidebar {
     width: 32vw;
@@ -111,10 +111,10 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    padding: $territory-width;
 
     .map {
-      $map-width: 68vw - $territory-width * 2;
+      font-size: .60vw;
+      $map-width: 60vw;
       width: $map-width;
       height: $map-width / 1.6;
       position: relative;
@@ -282,7 +282,8 @@
 
     .board {
       .map {
-        $map-width: 100vw - $territory-width * 2;
+        font-size: .88vw;
+        $map-width: 88vw;
         width: $map-width;
         height: $map-width / 1.6;
       }
