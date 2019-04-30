@@ -49,11 +49,14 @@ class App extends Component {
   };
 
   handleKeyDown = e => {
-    if (e.key === 'Escape') this.handleCancelDialog();
+    const {cancellable} = this.props.dialog;
+    if (cancellable && e.key === 'Escape') {
+      this.handleCancelDialog();
+    }
   };
 
   render() {
-    const {question} = this.props.dialog;
+    const {question, cancellable} = this.props.dialog;
     const {game, player} = this.props.server;
     const {answer} = this.state;
 
@@ -78,10 +81,13 @@ class App extends Component {
               <div className="empty"/>
               <div className="buttons">
                 <button className="button">Submit</button>
-                <button className="button" type="button"
-                        onClick={this.handleCancelDialog}>
-                  Cancel
-                </button>
+                {
+                  cancellable &&
+                  <button className="button" type="button"
+                          onClick={this.handleCancelDialog}>
+                    Cancel
+                  </button>
+                }
               </div>
             </form>
           }

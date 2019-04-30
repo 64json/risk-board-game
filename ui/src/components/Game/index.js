@@ -166,7 +166,7 @@ class Game extends Component {
           if (defendingTerritory.owner === player) {
             this.props.prompt(`<b>${attackingPlayer.name}</b> is attacking your <b>${defendingTerritory.name}</b>.<br>Enter the number of defending dice to roll: `, defendingDiceCount => {
               socket.defend(Number(defendingDiceCount) | 0);
-            });
+            }, null, null, false);
           }
         }
         return {
