@@ -151,6 +151,8 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
   }
 
   def createGame(gameName: String, ownerName: String): Unit = {
+    if (gameName == "") throw new Error("Game name cannot be empty.")
+    if (ownerName == "") throw new Error("Player name cannot be empty.")
     if (this.game.isDefined) throw new Error("The client is already in a game.")
     val game: Game = new Game(gameName, ownerName, this, game => {
       Client.games = Client.games.filter(_ != game)
@@ -173,6 +175,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
   }
 
   def joinGame(gameId: String, playerName: String): Unit = {
+    if (playerName == "") throw new Error("Player name cannot be empty.")
     if (this.game.isDefined) throw new Error("The client is already in a game.")
     val game = Client.findGame(gameId)
     val player = game.join(playerName, this)
