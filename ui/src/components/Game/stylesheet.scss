@@ -128,6 +128,30 @@
         .link {
           stroke: $color-hint;
           stroke-width: .2px;
+
+          &.continent-0 {
+            stroke: $color-player-0;
+          }
+
+          &.continent-1 {
+            stroke: $color-player-1;
+          }
+
+          &.continent-2 {
+            stroke: $color-player-2;
+          }
+
+          &.continent-3 {
+            stroke: $color-player-3;
+          }
+
+          &.continent-4 {
+            stroke: $color-player-4;
+          }
+
+          &.continent-5 {
+            stroke: $color-player-5;
+          }
         }
       }
     }

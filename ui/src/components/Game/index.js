@@ -327,11 +327,12 @@ class Game extends Component {
                   {
                     territories.flatMap(fromTerritory => fromTerritory.adjacencyTerritories.map(toTerritory => {
                       return (
-                        <line className="link"
-                              key={fromTerritory.id + '-' + toTerritory.id}
-                              x1={fromTerritory.x * 80}
-                              y1={fromTerritory.y * 50}
-                              x2={toTerritory.x * 80} y2={toTerritory.y * 50}/>
+                        <line
+                          className={classes('link', fromTerritory.continent === toTerritory.continent && `continent-${game.continents.indexOf(fromTerritory.continent)}`)}
+                          key={fromTerritory.id + '-' + toTerritory.id}
+                          x1={fromTerritory.x * 80}
+                          y1={fromTerritory.y * 50}
+                          x2={toTerritory.x * 80} y2={toTerritory.y * 50}/>
                       );
                     }))
                   }

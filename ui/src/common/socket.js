@@ -79,6 +79,9 @@ class Socket {
         if (this.game.continents) {
           this.game.continents.forEach(continent => {
             continent.territories.forEach(territory => {
+              if (!territory.continent) {
+                territory.continent = continent;
+              }
               if (isId(territory.adjacencyTerritories[0])) {
                 territory.adjacencyTerritories = territory.adjacencyTerritories.map(adjacencyTerritory => this.findTerritory(adjacencyTerritory));
               }
