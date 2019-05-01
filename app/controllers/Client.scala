@@ -220,6 +220,7 @@ class Client(val actorRef: ActorRef) extends Actor with Identifiable with Receiv
             "owner"
           )
         ),
+        "attack",
         "winner"
       )
     )

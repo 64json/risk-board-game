@@ -59,6 +59,11 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
           }
         }
       }
+      if (attack.isDefined) {
+        if (attack.get.fromTerritory.owner.contains(player) || attack.get.toTerritory.owner.contains(player)) {
+          attack = None
+        }
+      }
       if (owner == player) {
         owner = players.head
       }
@@ -88,12 +93,12 @@ class Game(val name: String, ownerName: String, ownerClient: Client, onDestroy: 
     turnIndex = Some(0)
     players(turnIndex.get).allotting = true
     continents = Some(Continent.createContinents)
-//    /* testing purpose:
+    /* testing purpose:
     territories.foreach(allotArmy(players(turnIndex.get), _))
     players.foreach(player => assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies))
     val player = players(turnIndex.get)
     assignArmies(player, territories.find(_.owner.contains(player)).get, player.assignedArmies)
-//    */
+    */
   }
 
   def territories: List[Territory] = continents.get.flatMap(_.territories)
