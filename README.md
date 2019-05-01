@@ -1,5 +1,7 @@
 # 🗺 Risk Board Game
 
+![UML Diagram](/design/screenshot.png)
+
 ## How to Run
 
 We use **Scala** + **Play Framework** for backend, **React** for frontend, and **WebSocket** to communicate between them.

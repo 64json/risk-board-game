@@ -6,7 +6,7 @@
   overflow-y: auto;
 
   .sidebar {
-    width: 32vw;
+    width: 28vw;
     padding: 2rem 1rem 1rem;
     display: flex;
     flex-direction: column;
@@ -113,8 +113,8 @@
     position: relative;
 
     .map {
-      font-size: .60vw;
-      $map-width: 60vw;
+      font-size: .64vw;
+      $map-width: 64vw;
       width: $map-width;
       height: $map-width / 1.6;
       position: relative;
@@ -271,6 +271,7 @@
     .winnerContainer {
       font-size: 4rem;
       color: white;
+      text-align: center;
     }
 
     .attackContainer,
